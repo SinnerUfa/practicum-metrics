@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	ExBadReqStringType = errors.New("Bad request string - type")
-	ExBadReqStringName = errors.New("Bad request string - name")
+	ErrBadReqStringType = errors.New("bad request string - type")
+	ErrBadReqStringName = errors.New("bad request string - name")
 )
 
 func SplitURL(u string) (mm *metrics.Metric, err error) {
@@ -23,19 +23,19 @@ func SplitURL(u string) (mm *metrics.Metric, err error) {
 	switch s[0] {
 	case "update":
 		if len(s) != 4 {
-			return nil, ExBadReqStringName
+			return nil, ErrBadReqStringName
 		}
 		m.Type = s[1]
 		m.Name = s[2]
 		m.Value = s[3]
 	case "value":
 		if len(s) != 3 {
-			return nil, ExBadReqStringName
+			return nil, ErrBadReqStringName
 		}
 		m.Type = s[1]
 		m.Name = s[2]
 	default:
-		return nil, ExBadReqStringType
+		return nil, ErrBadReqStringType
 	}
 	return &m, nil
 }

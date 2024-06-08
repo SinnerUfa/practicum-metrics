@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	ExNoAcsess              = errors.New("No access to object")
-	ExNotStructure          = errors.New("Object is not a structure")
-	ExFieldNotSet           = errors.New("Field cannot be set")
-	ExFieldTypeNotSupported = errors.New("Field type not supported")
+	ErrNoAcsess              = errors.New("no access to object")
+	ErrNotStructure          = errors.New("object is not a structure")
+	ErrFieldNotSet           = errors.New("field cannot be set")
+	ErrFieldTypeNotSupported = errors.New("field type not supported")
 )
 
 func Load(v any) error {
@@ -19,11 +19,11 @@ func Load(v any) error {
 	structTypePtr := reflect.TypeOf(v)
 
 	if structValuePtr.Kind() != reflect.Ptr {
-		return ExNoAcsess
+		return ErrNoAcsess
 	}
 
 	if structValuePtr.Elem().Kind() != reflect.Struct {
-		return ExNotStructure
+		return ErrNotStructure
 	}
 	structValue := structValuePtr.Elem()
 	structType := structTypePtr.Elem()
@@ -60,7 +60,7 @@ func GetEnv(key string) (string, bool) {
 
 func SetEnv(field reflect.Value, value string) error {
 	if !field.CanSet() {
-		return ExFieldNotSet
+		return ErrFieldNotSet
 	}
 	switch field.Kind() {
 	case reflect.Uint:
@@ -79,7 +79,7 @@ func SetEnv(field reflect.Value, value string) error {
 		}
 		field.SetInt(newValaue)
 	default:
-		return ExFieldTypeNotSupported
+		return ErrFieldTypeNotSupported
 	}
 	return nil
 }

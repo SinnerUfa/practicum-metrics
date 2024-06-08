@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	LOG_CRIT    = "CRITICAL: "
-	LOG_ERR     = "ERROR: "
-	LOG_WARNING = "WARNING: "
-	LOG_INFO    = "INFORMATION: "
-	LOG_DEBUG   = "DEBUG: "
+	LogCrit    = "CRITICAL: "
+	LogErr     = "ERROR: "
+	LogWarning = "WARNING: "
+	LogInfo    = "INFORMATION: "
+	LogDebug   = "DEBUG: "
 )
 
 type Logger interface {
@@ -62,26 +62,26 @@ func New(showDebug bool) Logger {
 }
 
 func (m *mlog) Crit(v ...any) {
-	m.errLogger.SetPrefix(LOG_CRIT)
+	m.errLogger.SetPrefix(LogCrit)
 	m.errLogger.Fatal(v...)
 }
 
 func (m *mlog) Error(v ...any) {
-	m.errLogger.SetPrefix(LOG_ERR)
+	m.errLogger.SetPrefix(LogErr)
 	m.errLogger.Panic(v...)
 }
 func (m *mlog) Warning(v ...any) {
-	m.outLogger.SetPrefix(LOG_WARNING)
+	m.outLogger.SetPrefix(LogWarning)
 	m.outLogger.Println(v...)
 }
 
 func (m *mlog) Info(v ...any) {
-	m.outLogger.SetPrefix(LOG_INFO)
+	m.outLogger.SetPrefix(LogInfo)
 	m.outLogger.Println(v...)
 }
 func (m *mlog) Debug(v ...any) {
 	if m.showDebug {
-		m.outLogger.SetPrefix(LOG_DEBUG)
+		m.outLogger.SetPrefix(LogDebug)
 		m.outLogger.Println(v...)
 	}
 }

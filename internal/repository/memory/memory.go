@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	ErrNotFound     = errors.New("Not found")
-	ErrNotSupported = errors.New("This type of metrics is not supported")
+	ErrNotFound     = errors.New("not found")
+	ErrNotSupported = errors.New("this type of metrics is not supported")
 )
 
 type Memory struct {
@@ -78,10 +78,10 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 
 func (mem *Memory) List() (out []metrics.Metric) {
 	for k, v := range mem.Counters {
-		out = append(out, metrics.Metric{k, fmt.Sprint(v.Value()), "counter"})
+		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "counter"})
 	}
 	for k, v := range mem.Gauges {
-		out = append(out, metrics.Metric{k, fmt.Sprint(v.Value()), "gauge"})
+		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "gauge"})
 	}
 	// fmt.Println(mem)
 	return

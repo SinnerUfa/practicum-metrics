@@ -13,12 +13,12 @@ func GetValue(log mlog.Logger, rep repository.Repository) http.Handler {
 			metr, err := SplitURL(r.URL.Path)
 			log.Info(r.URL.Path)
 			if err != nil {
-				if err == ExBadReqStringType {
+				if err == ErrBadReqStringType {
 					http.Error(w, err.Error(), http.StatusBadRequest)
 					log.Warning(err)
 					return
 				}
-				if err == ExBadReqStringName {
+				if err == ErrBadReqStringName {
 					http.Error(w, err.Error(), http.StatusNotFound)
 					log.Warning(err)
 					return

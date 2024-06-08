@@ -18,7 +18,7 @@ func Test_Load(t *testing.T) {
 			A uint   `env:"A" flag:"A"`
 			B int    `env:"B" flag:"-"`
 			C string `env:"-" flag:"C"`
-			D uint   `env:""flag:""`
+			D uint   `env:"" flag:""`
 			E uint   `env:"-" flag:"-"`
 			F uint
 		}
