@@ -68,7 +68,7 @@ func readFlags(v reflect.Value, t reflect.Type) map[int]Flag {
 
 func createFlags(f *flag.FlagSet, list map[int]Flag) error {
 	for k := range list {
-		var tmp Flag = list[k]
+		var tmp = list[k]
 		switch tmp.value.Kind() {
 		case reflect.Uint:
 			tmp.ptr = f.Uint(tmp.name, uint(tmp.value.Uint()), tmp.usage)
