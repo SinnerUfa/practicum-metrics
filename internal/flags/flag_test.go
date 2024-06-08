@@ -24,31 +24,31 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				a,
-				ExNoAcsess,
+				ErrNoAcsess,
 			},
 			{
 				b,
-				ExNoAcsess,
+				ErrNoAcsess,
 			},
 			{
 				c,
-				ExNoAcsess,
+				ErrNoAcsess,
 			},
 			{
 				d,
-				ExNoAcsess,
+				ErrNoAcsess,
 			},
 			{
 				&a,
-				ExNotStructure,
+				ErrNotStructure,
 			},
 			{
 				&b,
-				ExNotStructure,
+				ErrNotStructure,
 			},
 			{
 				&c,
-				ExNotStructure,
+				ErrNotStructure,
 			},
 		}
 
@@ -80,15 +80,15 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				&a,
-				ExFieldNotSet,
+				ErrFieldNotSet,
 			},
 			{
 				&b,
-				ExFieldTypeNotSupported,
+				ErrFieldTypeNotSupported,
 			},
 			{
 				&c,
-				ExFieldTypeNotSupported,
+				ErrFieldTypeNotSupported,
 			},
 		}
 		for _, test := range tests {
