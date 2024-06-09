@@ -3,7 +3,7 @@ package flags
 import (
 	"testing"
 
-	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
+	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	"github.com/stretchr/testify/assert"
 )
 

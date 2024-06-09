@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
+	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
 	cnt "github.com/SinnerUfa/practicum-metric/internal/metrics/counter"
 	gau "github.com/SinnerUfa/practicum-metric/internal/metrics/gauge"

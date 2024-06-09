@@ -3,7 +3,7 @@ package hundlers
 import (
 	"net/http"
 
-	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
+	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
 	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"

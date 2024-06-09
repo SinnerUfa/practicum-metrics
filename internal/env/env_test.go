@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
+	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -90,7 +90,7 @@ func Test_Load(t *testing.T) {
 			},
 			{
 				&c,
-				codes.ErrFlgFieldNotSupported,
+				codes.ErrEnvFieldNotSupported,
 			},
 		}
 		for _, test := range tests {

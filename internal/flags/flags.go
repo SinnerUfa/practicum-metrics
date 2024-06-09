@@ -4,7 +4,7 @@ import (
 	"flag"
 	"reflect"
 
-	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
+	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 )
 
 func Load(v any, args []string) error {
