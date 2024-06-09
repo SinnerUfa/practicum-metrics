@@ -10,8 +10,8 @@ import (
 )
 
 func addRoutes(mux *http.ServeMux, log mlog.Logger, rep repository.Repository) {
-	mux.Handle("GET /{$}", hundlers.GetList(log, rep))
-	// mux.Handle("GET /{$}", hundlers.Void(log, rep))
+	// mux.Handle("GET /{$}", hundlers.GetList(log, rep))
+	mux.Handle("GET /{$}", hundlers.Void(log, rep))
 	mux.Handle("POST /update/", hundlers.PostValue(log, rep))
 	mux.Handle("GET /value/", hundlers.GetValue(log, rep))
 }
