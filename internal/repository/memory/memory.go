@@ -74,7 +74,7 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 		if !ok {
 			return ErrNotFound
 		}
-		m.Value = fmt.Sprintf("%.4f", g.Value())
+		m.Value = fmt.Sprintf("%.5g", g.Value())
 	default:
 		return ErrNotSupported
 	}
@@ -89,7 +89,7 @@ func (mem *Memory) List() (out []metrics.Metric) {
 		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "counter"})
 	}
 	for k, v := range mem.Gauges {
-		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprintf("%.4f", v.Value()), Type: "gauge"})
+		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprintf("%.5g", v.Value()), Type: "gauge"})
 	}
 	// fmt.Println(mem)
 	return
