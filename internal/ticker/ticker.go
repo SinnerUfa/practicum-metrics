@@ -19,9 +19,6 @@ func NewAndRun(ctx context.Context, interval uint, s SlaveTicker) {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				// if err := s.Tick(); err != nil {
-				// 	return
-				// }
 				s.Tick()
 			}
 		}
