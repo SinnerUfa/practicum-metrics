@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
 	cnt "github.com/SinnerUfa/practicum-metric/internal/metrics/counter"
@@ -16,6 +17,7 @@ var (
 )
 
 type Memory struct {
+	sync.RWMutex
 	Counters map[string]*cnt.Counter
 	Gauges   map[string]*gau.Gauge
 }
@@ -28,6 +30,8 @@ func New() *Memory {
 }
 
 func (mem *Memory) Set(m metrics.Metric) error {
+	mem.Lock()
+	defer mem.Unlock()
 	switch m.Type {
 	case "counter":
 		v, err := strconv.ParseInt(m.Value, 10, 64)
@@ -56,6 +60,8 @@ func (mem *Memory) Set(m metrics.Metric) error {
 }
 
 func (mem *Memory) Get(m *metrics.Metric) error {
+	mem.RLock()
+	defer mem.RUnlock()
 	switch m.Type {
 	case "counter":
 		c, ok := mem.Counters[m.Name]
@@ -77,6 +83,8 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 }
 
 func (mem *Memory) List() (out []metrics.Metric) {
+	mem.RLock()
+	defer mem.RUnlock()
 	for k, v := range mem.Counters {
 		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "counter"})
 	}
