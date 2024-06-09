@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
@@ -74,7 +75,7 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 		if !ok {
 			return ErrNotFound
 		}
-		m.Value = fmt.Sprintf("%.5g", g.Value())
+		m.Value = strings.Trim(fmt.Sprintf("%.5f", g.Value()), "0 ")
 	default:
 		return ErrNotSupported
 	}
@@ -89,7 +90,7 @@ func (mem *Memory) List() (out []metrics.Metric) {
 		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "counter"})
 	}
 	for k, v := range mem.Gauges {
-		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprintf("%.5g", v.Value()), Type: "gauge"})
+		out = append(out, metrics.Metric{Name: k, Value: strings.Trim(fmt.Sprintf("%.5f", v.Value()), "0 "), Type: "gauge"})
 	}
 	// fmt.Println(mem)
 	return
