@@ -23,14 +23,15 @@ var (
 	ErrRepParseInt           = errors.New("rep: value int parse fail")
 	ErrRepNotFound           = errors.New("rep: not found")
 	ErrRepMetricNotSupported = errors.New("rep: this type of metrics is not supported")
-	//split
-	ErrGetValReqType = errors.New("bad request string - type")
-	ErrGetValReqName = errors.New("bad request string - name")
-
-	ErrPostValReqType  = errors.New("bad request string - type")
-	ErrPostValReqName  = errors.New("bad request string - name")
-	ErrPostValReqValue = errors.New("bad request string - value")
-
-	ErrGetLstReqType = errors.New("bad request string - type")
-	ErrGetLstReqName = errors.New("bad request string - name")
+	// get
+	ErrGetValReqType = errors.New("get value: bad request string - type")
+	ErrGetValReqName = errors.New("get value: bad request string - name")
+	// post
+	ErrPostValReqType  = errors.New("post value: bad request string - type")
+	ErrPostValReqName  = errors.New("post value: bad request string - name")
+	ErrPostValReqValue = errors.New("post value: bad request string - value")
+	// get list
+	ErrGetLstParse   = errors.New("get list: parse template faild")
+	ErrGetLstReqType = errors.New("get list: bad request string - type")
+	ErrGetLstReqName = errors.New("get list: bad request string - name")
 )
