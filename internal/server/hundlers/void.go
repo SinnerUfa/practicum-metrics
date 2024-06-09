@@ -10,7 +10,7 @@ import (
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func Void(log mlog.Logger, rep repository.Repository) http.Handler {
+func Void(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 	// t, err := template.ParseFiles("index.html", "body_list.html")
 	// if err != nil {
 	// 	log.Error("Loaded template incorrect")
@@ -18,7 +18,7 @@ func Void(log mlog.Logger, rep repository.Repository) http.Handler {
 	// log.Info("Loaded template")
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			// log.Info(r.URL.Path)
+			log.Info(r.URL.Path)
 			// metrs := rep.List()
 			w.Header().Set("Content-type", "text/plain ")
 			w.WriteHeader(http.StatusOK)

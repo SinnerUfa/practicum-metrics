@@ -11,10 +11,9 @@ import (
 
 func Run(ctx context.Context, log mlog.Logger, cfg Config) error {
 	rep := repository.New()
-	hundler := NewMainHundler(log, cfg, rep)
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
-		Handler: hundler,
+		Handler: Routes(log, cfg, rep),
 	}
 	go func(log mlog.Logger) {
 		log.Info("start server on adress:", httpServer.Addr)

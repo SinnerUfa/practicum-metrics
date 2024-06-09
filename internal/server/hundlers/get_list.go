@@ -9,7 +9,7 @@ import (
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func GetList(log mlog.Logger, rep repository.Repository) http.Handler {
+func GetList(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 	t, err := template.ParseFiles("index.html", "body_list.html")
 	if err != nil {
 		log.Error("Loaded template incorrect")

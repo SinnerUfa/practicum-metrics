@@ -7,11 +7,11 @@ import (
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func GetValue(log mlog.Logger, rep repository.Repository) http.Handler {
+func GetValue(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			metr, err := SplitURL(r.URL.Path)
 			log.Info(r.URL.Path)
+			metr, err := SplitURL(r.URL.Path)
 			if err != nil {
 				if err == ErrBadReqStringType {
 					http.Error(w, err.Error(), http.StatusBadRequest)

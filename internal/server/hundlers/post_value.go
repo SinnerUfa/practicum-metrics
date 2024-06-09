@@ -7,7 +7,7 @@ import (
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func PostValue(log mlog.Logger, rep repository.Repository) http.Handler {
+func PostValue(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			metr, err := SplitURL(r.URL.Path)

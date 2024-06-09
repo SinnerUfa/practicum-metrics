@@ -3,15 +3,20 @@ package server
 import (
 	"net/http"
 
-	hundlers "github.com/SinnerUfa/practicum-metric/internal/server/hundlers"
-
 	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
+	hundlers "github.com/SinnerUfa/practicum-metric/internal/server/hundlers"
+	chi "github.com/go-chi/chi/v5"
 )
 
-func addRoutes(mux *http.ServeMux, log mlog.Logger, rep repository.Repository) {
-	// mux.Handle("GET /{$}", hundlers.GetList(log, rep))
-	mux.Handle("GET /{$}", hundlers.Void(log, rep))
-	mux.Handle("POST /update/", hundlers.PostValue(log, rep))
-	mux.Handle("GET /value/", hundlers.GetValue(log, rep))
+func Routes(log mlog.Logger, cfg Config, rep repository.Repository) http.Handler {
+
+	r := chi.NewRouter()
+
+	r.Route("/", func(r chi.Router) {
+		r.Get("/", hundlers.Void(log, rep))
+		r.Post("/update/{name}/{type}/{value}", hundlers.PostValue(log, rep))
+		r.Get("/value/{name}/{type}", hundlers.GetValue(log, rep))
+	})
+	return r
 }
