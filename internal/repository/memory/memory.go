@@ -1,20 +1,15 @@
 package memory
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 
+	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
 	cnt "github.com/SinnerUfa/practicum-metric/internal/metrics/counter"
 	gau "github.com/SinnerUfa/practicum-metric/internal/metrics/gauge"
-)
-
-var (
-	ErrNotFound     = errors.New("not found")
-	ErrNotSupported = errors.New("this type of metrics is not supported")
 )
 
 type Memory struct {
@@ -37,7 +32,7 @@ func (mem *Memory) Set(m metrics.Metric) error {
 	case "counter":
 		v, err := strconv.ParseInt(m.Value, 10, 64)
 		if err != nil {
-			return err
+			return codes.ErrRepParseInt
 		}
 		if _, ok := mem.Counters[m.Name]; !ok {
 			mem.Counters[m.Name] = &cnt.Counter{}
@@ -47,16 +42,15 @@ func (mem *Memory) Set(m metrics.Metric) error {
 	case "gauge":
 		v, err := strconv.ParseFloat(m.Value, 64)
 		if err != nil {
-			return err
+			return codes.ErrRepParseFloat
 		}
 		if _, ok := mem.Gauges[m.Name]; !ok {
 			mem.Gauges[m.Name] = &gau.Gauge{}
 		}
 		mem.Gauges[m.Name].Set(v)
 	default:
-		return ErrNotSupported
+		return codes.ErrRepMetricNotSupported
 	}
-	// fmt.Println(mem)
 	return nil
 }
 
@@ -67,19 +61,18 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 	case "counter":
 		c, ok := mem.Counters[m.Name]
 		if !ok {
-			return ErrNotFound
+			return codes.ErrRepNotFound
 		}
 		m.Value = fmt.Sprint(c.Value())
 	case "gauge":
 		g, ok := mem.Gauges[m.Name]
 		if !ok {
-			return ErrNotFound
+			return codes.ErrRepNotFound
 		}
 		m.Value = strings.Trim(fmt.Sprintf("%.5f", g.Value()), "0 .")
 	default:
-		return ErrNotSupported
+		return codes.ErrRepMetricNotSupported
 	}
-	// fmt.Println(mem)
 	return nil
 }
 
@@ -92,7 +85,6 @@ func (mem *Memory) List() (out []metrics.Metric) {
 	for k, v := range mem.Gauges {
 		out = append(out, metrics.Metric{Name: k, Value: strings.Trim(fmt.Sprintf("%.5f", v.Value()), "0 ."), Type: "gauge"})
 	}
-	// fmt.Println(mem)
 	return
 }
 

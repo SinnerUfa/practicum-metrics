@@ -1,16 +1,10 @@
 package flags
 
 import (
-	"errors"
 	"flag"
 	"reflect"
-)
 
-var (
-	ErrNoAcsess              = errors.New("no access to object")
-	ErrNotStructure          = errors.New("object is not a structure")
-	ErrFieldNotSet           = errors.New("field cannot be set")
-	ErrFieldTypeNotSupported = errors.New("field type not supported")
+	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
 )
 
 func Load(v any, args []string) error {
@@ -18,11 +12,11 @@ func Load(v any, args []string) error {
 	structTypePtr := reflect.TypeOf(v)
 
 	if structValuePtr.Kind() != reflect.Ptr {
-		return ErrNoAcsess
+		return codes.ErrFlgNoAcsess
 	}
 
 	if structValuePtr.Elem().Kind() != reflect.Struct {
-		return ErrNotStructure
+		return codes.ErrFlgNotStructure
 	}
 	structValue := structValuePtr.Elem()
 	structType := structTypePtr.Elem()
@@ -33,7 +27,7 @@ func Load(v any, args []string) error {
 		return err
 	}
 	if err := flags.Parse(args); err != nil {
-		return err
+		return codes.ErrFlgParseFlag
 	}
 	if err := setFlags(structValue, flagMap); err != nil {
 		return err
@@ -77,7 +71,7 @@ func createFlags(f *flag.FlagSet, list map[int]Flag) error {
 		case reflect.Int:
 			tmp.ptr = f.Int(tmp.name, int(tmp.value.Int()), tmp.usage)
 		default:
-			return ErrFieldTypeNotSupported
+			return codes.ErrFlgFieldNotSupported
 		}
 		list[k] = tmp
 	}
@@ -92,7 +86,7 @@ func setFlags(v reflect.Value, list map[int]Flag) error {
 		}
 		fieldValue := v.Field(i)
 		if !fieldValue.CanSet() {
-			return ErrFieldNotSet
+			return codes.ErrFlgFieldNotSet
 		}
 		value := reflect.Indirect(reflect.ValueOf(list[i].ptr))
 
@@ -104,7 +98,7 @@ func setFlags(v reflect.Value, list map[int]Flag) error {
 		case reflect.Int:
 			fieldValue.SetInt(value.Int())
 		default:
-			return ErrFieldTypeNotSupported
+			return codes.ErrFlgFieldNotSupported
 		}
 	}
 	return nil

@@ -1,17 +1,11 @@
 package env
 
 import (
-	"errors"
 	"os"
 	"reflect"
 	"strconv"
-)
 
-var (
-	ErrNoAcsess              = errors.New("no access to object")
-	ErrNotStructure          = errors.New("object is not a structure")
-	ErrFieldNotSet           = errors.New("field cannot be set")
-	ErrFieldTypeNotSupported = errors.New("field type not supported")
+	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
 )
 
 func Load(v any) error {
@@ -19,11 +13,11 @@ func Load(v any) error {
 	structTypePtr := reflect.TypeOf(v)
 
 	if structValuePtr.Kind() != reflect.Ptr {
-		return ErrNoAcsess
+		return codes.ErrEnvNoAcsess
 	}
 
 	if structValuePtr.Elem().Kind() != reflect.Struct {
-		return ErrNotStructure
+		return codes.ErrEnvNotStructure
 	}
 	structValue := structValuePtr.Elem()
 	structType := structTypePtr.Elem()
@@ -60,13 +54,13 @@ func GetEnv(key string) (string, bool) {
 
 func SetEnv(field reflect.Value, value string) error {
 	if !field.CanSet() {
-		return ErrFieldNotSet
+		return codes.ErrEnvFieldNotSet
 	}
 	switch field.Kind() {
 	case reflect.Uint:
 		newValaue, err := strconv.ParseUint(value, 10, 32)
 		if err != nil {
-			return err
+			return codes.ErrEnvFieldParseUint
 		}
 		field.SetUint(newValaue)
 
@@ -75,11 +69,11 @@ func SetEnv(field reflect.Value, value string) error {
 	case reflect.Int:
 		newValaue, err := strconv.ParseInt(value, 10, 32)
 		if err != nil {
-			return err
+			return codes.ErrEnvFieldParseInt
 		}
 		field.SetInt(newValaue)
 	default:
-		return ErrFieldTypeNotSupported
+		return codes.ErrEnvFieldNotSupported
 	}
 	return nil
 }

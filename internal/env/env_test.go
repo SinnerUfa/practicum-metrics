@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,31 +26,31 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				a,
-				ErrNoAcsess,
+				codes.ErrEnvNoAcsess,
 			},
 			{
 				b,
-				ErrNoAcsess,
+				codes.ErrEnvNoAcsess,
 			},
 			{
 				c,
-				ErrNoAcsess,
+				codes.ErrEnvNoAcsess,
 			},
 			{
 				d,
-				ErrNoAcsess,
+				codes.ErrEnvNoAcsess,
 			},
 			{
 				&a,
-				ErrNotStructure,
+				codes.ErrEnvNotStructure,
 			},
 			{
 				&b,
-				ErrNotStructure,
+				codes.ErrEnvNotStructure,
 			},
 			{
 				&c,
-				ErrNotStructure,
+				codes.ErrEnvNotStructure,
 			},
 		}
 
@@ -81,15 +82,15 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				&a,
-				ErrFieldNotSet,
+				codes.ErrEnvFieldNotSet,
 			},
 			{
 				&b,
-				ErrFieldNotSet,
+				codes.ErrEnvFieldNotSet,
 			},
 			{
 				&c,
-				ErrFieldTypeNotSupported,
+				codes.ErrFlgFieldNotSupported,
 			},
 		}
 		for _, test := range tests {

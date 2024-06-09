@@ -3,6 +3,7 @@ package flags
 import (
 	"testing"
 
+	codes "github.com/SinnerUfa/practicum-metric/internal/err_codes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,31 +25,31 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				a,
-				ErrNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				b,
-				ErrNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				c,
-				ErrNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				d,
-				ErrNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				&a,
-				ErrNotStructure,
+				codes.ErrFlgNotStructure,
 			},
 			{
 				&b,
-				ErrNotStructure,
+				codes.ErrFlgNotStructure,
 			},
 			{
 				&c,
-				ErrNotStructure,
+				codes.ErrFlgNotStructure,
 			},
 		}
 
@@ -80,15 +81,15 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				&a,
-				ErrFieldNotSet,
+				codes.ErrFlgFieldNotSet,
 			},
 			{
 				&b,
-				ErrFieldTypeNotSupported,
+				codes.ErrFlgFieldNotSupported,
 			},
 			{
 				&c,
-				ErrFieldTypeNotSupported,
+				codes.ErrFlgFieldNotSupported,
 			},
 		}
 		for _, test := range tests {
