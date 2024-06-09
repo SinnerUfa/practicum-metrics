@@ -9,6 +9,7 @@ type Repository interface {
 	Set(m metrics.Metric) error
 	Get(m *metrics.Metric) error
 	List() (out []metrics.Metric)
+	SetList([]metrics.Metric) error
 }
 
 func New() Repository {

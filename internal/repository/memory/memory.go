@@ -74,7 +74,7 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 		if !ok {
 			return ErrNotFound
 		}
-		m.Value = fmt.Sprint(g.Value())
+		m.Value = fmt.Sprintf("%.f", g.Value())
 	default:
 		return ErrNotSupported
 	}
@@ -89,8 +89,17 @@ func (mem *Memory) List() (out []metrics.Metric) {
 		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "counter"})
 	}
 	for k, v := range mem.Gauges {
-		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "gauge"})
+		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprintf("%.f", v.Value()), Type: "gauge"})
 	}
 	// fmt.Println(mem)
 	return
+}
+
+func (mem *Memory) SetList(in []metrics.Metric) error {
+	for _, v := range in {
+		if err := mem.Set(v); err != nil {
+			return err
+		}
+	}
+	return nil
 }
