@@ -15,8 +15,8 @@ func Routes(log mlog.Logger, cfg Config, rep repository.Repository) http.Handler
 
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", hundlers.Void(log, rep))
-		r.Post("/update/{name}/{type}/{value}", hundlers.PostValue(log, rep))
-		r.Get("/value/{name}/{type}", hundlers.GetValue(log, rep))
+		r.Post("/update/{type}/{name}/{value}", hundlers.PostValue(log, rep))
+		r.Get("/value/{type}/{name}", hundlers.GetValue(log, rep))
 	})
 	return r
 }
