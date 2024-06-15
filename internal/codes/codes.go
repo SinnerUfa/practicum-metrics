@@ -34,4 +34,7 @@ var (
 	ErrGetLstParse   = errors.New("get list: parse template faild")
 	ErrGetLstReqType = errors.New("get list: bad request string - type")
 	ErrGetLstReqName = errors.New("get list: bad request string - name")
+	// server
+	ErrSrvListen   = errors.New("server: error listening and serving")
+	ErrSrvShutdown = errors.New("server: error shutdown")
 )

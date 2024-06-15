@@ -16,8 +16,8 @@ const (
 )
 
 type Logger interface {
-	Crit(v ...any)
-	Error(v ...any)
+	Fatal(v ...any)
+	Panic(v ...any)
 	Warning(v ...any)
 	Info(v ...any)
 	Debug(v ...any)
@@ -61,12 +61,12 @@ func New(showDebug bool) Logger {
 	return instance
 }
 
-func (m *mlog) Crit(v ...any) {
+func (m *mlog) Fatal(v ...any) {
 	m.errLogger.SetPrefix(LogCrit)
 	m.errLogger.Fatal(v...)
 }
 
-func (m *mlog) Error(v ...any) {
+func (m *mlog) Panic(v ...any) {
 	m.errLogger.SetPrefix(LogErr)
 	m.errLogger.Panic(v...)
 }
