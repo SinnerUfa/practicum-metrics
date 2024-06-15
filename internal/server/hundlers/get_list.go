@@ -16,6 +16,7 @@ func GetList(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 			if err != nil {
 				http.Error(w, codes.ErrRepNotFound.Error(), http.StatusInternalServerError)
 				log.Warning(codes.ErrGetLstParse)
+				return
 			}
 			log.Info(r.URL.Path)
 			metrs := rep.List()
