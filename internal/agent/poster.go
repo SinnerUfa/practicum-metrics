@@ -24,26 +24,14 @@ func (m *MetricPost) Post() error {
 	l := m.rep.List()
 	client := resty.New()
 
-	for _, v := range l {
-		endpoint := "http://" + m.adress + "/" + v.ReguestString("update")
-		// request, err := http.NewRequestWithContext(m.ctx, http.MethodPost, endpoint, http.NoBody)
-		// if err != nil {
-		// 	return err
-		// }
-		// request.Header.Add("Content-Type", "text/plain")
+	endpoint := "http://" + m.adress + "/"
 
-		// response, err := client.Do(request)
-		// if err != nil {
-		// 	return nil // нужно подумать
-		// }
-		// defer response.Body.Close()
-		// _, err = io.ReadAll(response.Body)
-		// if err != nil {
-		// 	return nil
-		// }
-		_, err := client.R().SetHeader("Content-Type", "text/plain").Post(endpoint)
+	for _, v := range l {
+
+		_, err := client.R().SetHeader("Content-Type", "text/plain").Post(endpoint + v.ReguestString("update"))
 		if err != nil {
-			return nil
+			m.log.Warning(err)
+			return err
 		}
 
 	}
