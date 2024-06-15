@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"net/http"
-	"sync"
 
 	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
@@ -22,15 +21,10 @@ func Run(ctx context.Context, log mlog.Logger, cfg Config) error {
 		}
 	}(log)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func(log mlog.Logger) {
-		defer wg.Done()
-		<-ctx.Done()
-		if err := httpServer.Shutdown(ctx); err != nil {
-			log.Error("error shutdown server: ", err)
-		}
-	}(log)
-	wg.Wait()
+	<-ctx.Done()
+	if err := httpServer.Shutdown(ctx); err != nil {
+		log.Error("error shutdown server: ", err)
+		return err
+	}
 	return nil
 }
