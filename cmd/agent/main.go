@@ -16,8 +16,7 @@ func main() {
 	log := mlog.New(true)
 
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {
-		log.Warning(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	log.Info("\nCurrent configuration:", cfg)
 
@@ -25,9 +24,8 @@ func main() {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 
 	if err := run(ctx, log, cfg); err != nil {
-		log.Warning(err)
 		cancel()
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 

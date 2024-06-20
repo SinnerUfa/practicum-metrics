@@ -12,13 +12,5 @@ func Load(v any, args []string) error {
 	if err := env.Load(v); err != nil {
 		return err
 	}
-	// if err:=validate(v);err!=nil{
-	//     return err
-	// }
-
 	return nil
 }
-
-// func validate(v any){
-
-// }
