@@ -69,7 +69,7 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 		if !ok {
 			return codes.ErrRepNotFound
 		}
-		m.Value = strings.Trim(fmt.Sprintf("%.5f", g.Value()), "0 .")
+		m.Value = TrimFloat(g.Value())
 	default:
 		return codes.ErrRepMetricNotSupported
 	}
@@ -83,7 +83,7 @@ func (mem *Memory) List() (out []metrics.Metric) {
 		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "counter"})
 	}
 	for k, v := range mem.Gauges {
-		out = append(out, metrics.Metric{Name: k, Value: strings.Trim(fmt.Sprintf("%.5f", v.Value()), "0 ."), Type: "gauge"})
+		out = append(out, metrics.Metric{Name: k, Value: TrimFloat(v.Value()), Type: "gauge"})
 	}
 	return
 }
@@ -95,4 +95,13 @@ func (mem *Memory) SetList(in []metrics.Metric) error {
 		}
 	}
 	return nil
+}
+
+func TrimFloat(v float64) string {
+	s := strings.Split(fmt.Sprintf("%.5f", v), ".")
+	s[1] = strings.Trim(s[1], ". 0")
+	if s[1] == "" {
+		return s[0]
+	}
+	return strings.Join(s, ".")
 }

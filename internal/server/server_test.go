@@ -92,7 +92,7 @@ func Test_Hundlers(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
-	log.Info(rep.List())
+	log.Info("rep0 ", rep.List())
 	for _, test := range testsPostVoid {
 		t.Run("testsPostVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, test.req, nil)
@@ -111,7 +111,7 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
-	log.Info(rep.List())
+	log.Info("rep1 ", rep.List())
 	for _, test := range testsGet {
 		t.Run("testsGet", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
@@ -130,4 +130,5 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
+	log.Info("rep2 ", rep.List())
 }
