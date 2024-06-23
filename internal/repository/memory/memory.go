@@ -99,7 +99,7 @@ func (mem *Memory) SetList(in []metrics.Metric) error {
 
 func TrimFloat(v float64) string {
 	s := strings.Split(fmt.Sprintf("%.5f", v), ".")
-	s[1] = strings.Trim(s[1], ". 0")
+	s[1] = strings.TrimRight(s[1], ". 0")
 	if s[1] == "" {
 		return s[0]
 	}
