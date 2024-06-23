@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 	"github.com/stretchr/testify/assert"
@@ -24,6 +25,12 @@ func Test_Hundlers(t *testing.T) {
 	}
 	testsGetVoid := []pair{
 		{
+			req: "/value//test0",
+			want: want{
+				code: http.StatusBadRequest,
+			},
+		},
+		{
 			req: "/value/gauge/test0",
 			want: want{
 				code: http.StatusNotFound,
@@ -33,6 +40,12 @@ func Test_Hundlers(t *testing.T) {
 			req: "/value/counter/test1",
 			want: want{
 				code: http.StatusNotFound,
+			},
+		},
+		{
+			req: "/value/abc/test1",
+			want: want{
+				code: http.StatusBadRequest,
 			},
 		},
 	}
@@ -51,6 +64,30 @@ func Test_Hundlers(t *testing.T) {
 				code:        http.StatusOK,
 				response:    "",
 				contentType: "text/plain",
+			},
+		},
+		{
+			req: "/update/counter/test1/abc",
+			want: want{
+				code:        http.StatusBadRequest,
+				response:    codes.ErrRepParseInt.Error() + "\n",
+				contentType: "text/plain; charset=utf-8",
+			},
+		},
+		{
+			req: "/update/gauge/test1/abc",
+			want: want{
+				code:        http.StatusBadRequest,
+				response:    codes.ErrRepParseFloat.Error() + "\n",
+				contentType: "text/plain; charset=utf-8",
+			},
+		},
+		{
+			req: "/update/abc/test1/100",
+			want: want{
+				code:        http.StatusBadRequest,
+				response:    codes.ErrRepMetricNotSupported.Error() + "\n",
+				contentType: "text/plain; charset=utf-8",
 			},
 		},
 	}
