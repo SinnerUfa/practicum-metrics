@@ -20,7 +20,7 @@ func GetList(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 			}
 			log.Info(r.URL.Path)
 			metrs := rep.List()
-			w.Header().Set("Content-type", "text/plain ")
+			w.Header().Set("Content-type", "text/plain")
 			w.WriteHeader(http.StatusOK)
 			log.Info(metrs)
 			t.Execute(w, metrs)

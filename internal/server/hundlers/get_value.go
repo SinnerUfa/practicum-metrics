@@ -43,7 +43,7 @@ func GetValue(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 				return
 			}
 
-			w.Header().Set("Content-type", "text/plain ")
+			w.Header().Set("Content-type", "text/plain")
 			w.WriteHeader(http.StatusOK)
 			log.Info(*metr)
 			w.Write([]byte(metr.Value))

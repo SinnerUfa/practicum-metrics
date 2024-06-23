@@ -44,7 +44,7 @@ func PostValue(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
 				return
 			}
 
-			w.Header().Set("Content-type", "text/plain ")
+			w.Header().Set("Content-type", "text/plain")
 			w.WriteHeader(http.StatusOK)
 		})
 }

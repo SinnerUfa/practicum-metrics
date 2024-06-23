@@ -13,7 +13,7 @@ func Run(ctx context.Context, log mlog.Logger, cfg Config) error {
 	rep := repository.New()
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
-		Handler: Routes(log, cfg, rep),
+		Handler: Routes(log, rep),
 	}
 	errChan := make(chan error)
 	go func(log mlog.Logger, ch chan error) {
