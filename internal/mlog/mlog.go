@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	LogCrit    = "CRITICAL: "
-	LogErr     = "ERROR: "
+	LogFatal   = "FATAL: "
+	LogPanic   = "PANIC: "
 	LogWarning = "WARNING: "
 	LogInfo    = "INFORMATION: "
 	LogDebug   = "DEBUG: "
@@ -62,12 +62,12 @@ func New(showDebug bool) Logger {
 }
 
 func (m *mlog) Fatal(v ...any) {
-	m.errLogger.SetPrefix(LogCrit)
+	m.errLogger.SetPrefix(LogFatal)
 	m.errLogger.Fatal(v...)
 }
 
 func (m *mlog) Panic(v ...any) {
-	m.errLogger.SetPrefix(LogErr)
+	m.errLogger.SetPrefix(LogPanic)
 	m.errLogger.Panic(v...)
 }
 func (m *mlog) Warning(v ...any) {
