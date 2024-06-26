@@ -1,87 +1,108 @@
+// mlog - package for connecting loggers via interface slog
+// TODO: implement or find a more informative handler
 package mlog
 
 import (
 	"io"
-	"log"
+	"log/slog"
 	"os"
+	"path/filepath"
 	"sync"
 )
 
-const (
-	LogFatal   = "FATAL: "
-	LogPanic   = "PANIC: "
-	LogWarning = "WARNING: "
-	LogInfo    = "INFORMATION: "
-	LogDebug   = "DEBUG: "
-)
-
-type Logger interface {
-	Fatal(v ...any)
-	Panic(v ...any)
-	Warning(v ...any)
-	Info(v ...any)
-	Debug(v ...any)
-}
-
-type mlog struct {
-	showDebug bool
-	errLogger *log.Logger
-	outLogger *log.Logger
-}
-
 var (
-	instance *mlog
+	instance *slog.Logger
 	once     sync.Once
 )
 
 const (
 	outFileName string = "out.log"
-	errFileName string = "err.log"
 )
 
-func New(showDebug bool) Logger {
+type LoggerType int
+
+const (
+	SlogType LoggerType = iota
+	ZapType
+)
+
+func New(l LoggerType) *slog.Logger {
 	once.Do(func() {
 		o := []io.Writer{os.Stdout}
 		f, err := os.OpenFile(outFileName, os.O_CREATE|os.O_WRONLY, os.ModePerm)
 		if err == nil {
 			o = append(o, f)
 		}
+		var handler slog.Handler
+		switch l {
+		case SlogType:
+			handler = slogHandler(io.MultiWriter(o...))
+		case ZapType:
+			handler = zapHandler(io.MultiWriter(o...))
+		default:
+			handler = slogHandler(io.MultiWriter(o...))
+		}
 
-		e := []io.Writer{os.Stderr}
-		f, err = os.OpenFile(errFileName, os.O_CREATE|os.O_WRONLY, os.ModePerm)
-		if err == nil {
-			e = append(e, f)
-		}
-		instance = &mlog{
-			showDebug: showDebug,
-			outLogger: log.New(io.MultiWriter(o...), "", log.LstdFlags|log.LUTC),
-			errLogger: log.New(io.MultiWriter(e...), "", log.LstdFlags|log.LUTC),
-		}
+		instance = slog.New(handler)
 	})
+
 	return instance
 }
 
-func (m *mlog) Fatal(v ...any) {
-	m.errLogger.SetPrefix(LogFatal)
-	m.errLogger.Fatal(v...)
-}
+func slogHandler(w io.Writer) *slog.JSONHandler {
+	replace := func(groups []string, a slog.Attr) slog.Attr {
+		switch a.Key {
+		case slog.MessageKey:
+			if a.Value.String() == "" {
+				return slog.Attr{}
+			}
+		case slog.TimeKey:
+			timeString := a.Value.Time().Format("15:05:05.00")
+			return slog.Attr{slog.TimeKey, slog.StringValue(timeString)}
+		case slog.SourceKey:
+			source := a.Value.Any().(*slog.Source)
+			source = &slog.Source{
+				File:     filepath.Base(filepath.Dir(source.File)) + "/" + filepath.Base(source.File),
+				Function: filepath.Base(source.Function),
+				Line:     source.Line,
+			}
 
-func (m *mlog) Panic(v ...any) {
-	m.errLogger.SetPrefix(LogPanic)
-	m.errLogger.Panic(v...)
-}
-func (m *mlog) Warning(v ...any) {
-	m.outLogger.SetPrefix(LogWarning)
-	m.outLogger.Println(v...)
-}
-
-func (m *mlog) Info(v ...any) {
-	m.outLogger.SetPrefix(LogInfo)
-	m.outLogger.Println(v...)
-}
-func (m *mlog) Debug(v ...any) {
-	if m.showDebug {
-		m.outLogger.SetPrefix(LogDebug)
-		m.outLogger.Println(v...)
+			return slog.Any(slog.SourceKey, source)
+		}
+		return a
 	}
+	options := &slog.HandlerOptions{
+		AddSource:   true,
+		ReplaceAttr: replace,
+	}
+	return slog.NewJSONHandler(w, options)
+}
+
+func zapHandler(w io.Writer) *slog.JSONHandler {
+	replace := func(groups []string, a slog.Attr) slog.Attr {
+		switch a.Key {
+		case slog.MessageKey:
+			if a.Value.String() == "" {
+				return slog.Attr{}
+			}
+		case slog.TimeKey:
+			timeString := a.Value.Time().Format("15:05:05.00")
+			return slog.Attr{slog.TimeKey, slog.StringValue(timeString)}
+		case slog.SourceKey:
+			source := a.Value.Any().(*slog.Source)
+			source = &slog.Source{
+				File:     filepath.Base(filepath.Dir(source.File)) + "/" + filepath.Base(source.File),
+				Function: filepath.Base(source.Function),
+				Line:     source.Line,
+			}
+
+			return slog.Any(slog.SourceKey, source)
+		}
+		return a
+	}
+	options := &slog.HandlerOptions{
+		AddSource:   true,
+		ReplaceAttr: replace,
+	}
+	return slog.NewJSONHandler(w, options)
 }

@@ -2,13 +2,13 @@ package agent
 
 import (
 	"context"
+	"log/slog"
 
-	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 	ticker "github.com/SinnerUfa/practicum-metric/internal/ticker"
 )
 
-func Run(ctx context.Context, log mlog.Logger, cfg Config) error {
+func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
 	rep := repository.New()
 	loader := NewLoader(log, rep)
 	ticker.NewAndRun(ctx, cfg.PollInterval, loader)

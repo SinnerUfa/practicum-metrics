@@ -1,13 +1,13 @@
 package hundlers
 
 import (
+	"log/slog"
 	"net/http"
 
-	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func Void(log mlog.Logger, rep repository.Repository) http.HandlerFunc {
+func Void(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			log.Info(r.URL.Path)

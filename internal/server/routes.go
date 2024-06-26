@@ -1,15 +1,15 @@
 package server
 
 import (
+	"log/slog"
 	"net/http"
 
-	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 	hundlers "github.com/SinnerUfa/practicum-metric/internal/server/hundlers"
 	chi "github.com/go-chi/chi/v5"
 )
 
-func Routes(log mlog.Logger, rep repository.Repository) http.Handler {
+func Routes(log *slog.Logger, rep repository.Repository) http.Handler {
 
 	r := chi.NewRouter()
 
