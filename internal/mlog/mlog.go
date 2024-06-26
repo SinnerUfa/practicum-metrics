@@ -58,7 +58,10 @@ func slogHandler(w io.Writer) *slog.JSONHandler {
 			}
 		case slog.TimeKey:
 			timeString := a.Value.Time().Format("15:05:05.00")
-			return slog.Attr{slog.TimeKey, slog.StringValue(timeString)}
+			return slog.Attr{
+				Key:   slog.TimeKey,
+				Value: slog.StringValue(timeString),
+			}
 		case slog.SourceKey:
 			source := a.Value.Any().(*slog.Source)
 			source = &slog.Source{
@@ -87,7 +90,10 @@ func zapHandler(w io.Writer) *slog.JSONHandler {
 			}
 		case slog.TimeKey:
 			timeString := a.Value.Time().Format("15:05:05.00")
-			return slog.Attr{slog.TimeKey, slog.StringValue(timeString)}
+			return slog.Attr{
+				Key:   slog.TimeKey,
+				Value: slog.StringValue(timeString),
+			}
 		case slog.SourceKey:
 			source := a.Value.Any().(*slog.Source)
 			source = &slog.Source{
