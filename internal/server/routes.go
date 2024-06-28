@@ -12,7 +12,7 @@ import (
 func Routes(log *slog.Logger, rep repository.Repository) http.Handler {
 
 	r := chi.NewRouter()
-
+	// r.Use(http.Handler(hundlers.Logger(log)))
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", hundlers.GetList(log, rep))
 		r.Post("/update/{type}/{name}/{value}", hundlers.PostValue(log, rep))

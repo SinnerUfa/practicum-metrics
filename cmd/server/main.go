@@ -14,7 +14,7 @@ import (
 var cfg server.Config = server.DefaultConfig
 
 func main() {
-	log := mlog.New(mlog.SlogType)
+	log := mlog.New(mlog.ZapType)
 
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {
 		log.Error("", "err", err)
