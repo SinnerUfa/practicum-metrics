@@ -21,7 +21,6 @@ func PostValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 				Type:  typ,
 				Value: value,
 			}
-			log.Info("post request", "URL", r.URL.Path, "Name", name, "Type", typ, "Value", value)
 			if name == "" {
 				http.Error(w, codes.ErrPostValReqName.Error(), http.StatusBadRequest)
 				log.Warn("", "err", codes.ErrPostValReqName)

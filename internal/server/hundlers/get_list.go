@@ -18,11 +18,9 @@ func GetList(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 				log.Warn("", "err", codes.ErrGetLstParse)
 				return
 			}
-			log.Info("get list request", "URL", r.URL.Path)
 			metrs := rep.List()
 			w.Header().Set("Content-type", "text/plain")
 			w.WriteHeader(http.StatusOK)
-			log.Info("", "metrics", metrs)
 			t.Execute(w, metrs)
 		})
 }

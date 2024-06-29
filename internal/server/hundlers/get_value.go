@@ -19,8 +19,6 @@ func GetValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 				Name: name,
 				Type: typ,
 			}
-			log.Info("get request", "URL", r.URL.Path, "Name", name, "Type", typ)
-
 			if name == "" {
 				http.Error(w, codes.ErrGetValReqName.Error(), http.StatusBadRequest)
 				log.Warn("", "err", codes.ErrGetValReqName)
@@ -45,7 +43,6 @@ func GetValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 
 			w.Header().Set("Content-type", "text/plain")
 			w.WriteHeader(http.StatusOK)
-			log.Info("", "metrics", *metr)
 			w.Write([]byte(metr.Value))
 		})
 }
