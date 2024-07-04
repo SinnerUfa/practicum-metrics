@@ -42,4 +42,8 @@ var (
 	ErrPostBadBody   = errors.New("bad request - bad body")
 	ErrPostMarshal   = errors.New("error of marshaling")
 	ErrPostUnmarshal = errors.New("error of unmarshaling")
+	// compressor
+	ErrCompressor = errors.New("bad compressor init")
+	// decompressor
+	ErrDecompressor = errors.New("bad decompressor init")
 )

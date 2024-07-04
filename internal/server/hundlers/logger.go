@@ -51,7 +51,7 @@ func Logger(log *slog.Logger) func(http.Handler) http.Handler {
 				slog.Group("response",
 					slog.Int("status", lw.status),
 					slog.Int("size", lw.buf.Len()),
-					slog.String("body", lw.buf.String())),
+					/*slog.String("body", lw.buf.String())*/),
 				slog.Duration("duration", time.Since(start)))
 		}
 		return http.HandlerFunc(hundler)

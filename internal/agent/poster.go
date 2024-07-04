@@ -27,7 +27,7 @@ func (m *MetricPost) Post() error {
 	endpoint := "http://" + m.adress + "/update/"
 
 	for _, v := range l {
-		_, err := client.R().SetHeader("Content-Type", "application/json").SetBody(v).Post(endpoint)
+		_, err := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip").SetBody(v).Post(endpoint)
 		if err != nil {
 			m.log.Warn("", "err", err)
 			return err

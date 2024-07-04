@@ -1,6 +1,8 @@
 package server
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"log/slog"
 	"net/http"
@@ -11,9 +13,23 @@ import (
 
 func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
 	rep := repository.New()
+
+	var buf bytes.Buffer
+	gzr, err := gzip.NewReader(&buf)
+	if err != nil {
+		log.Warn("", "err", codes.ErrDecompressor, "gzerr", err)
+	}
+	defer gzr.Close()
+
+	gzw, err := gzip.NewWriterLevel(&buf, gzip.BestSpeed)
+	if err != nil {
+		log.Warn("", "err", codes.ErrCompressor, "gzerr", err)
+	}
+	defer gzw.Close()
+
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
-		Handler: Routes(log, rep),
+		Handler: Routes(log, rep, gzr, gzw),
 	}
 	errChan := make(chan error)
 	go func(log *slog.Logger, ch chan error) {
