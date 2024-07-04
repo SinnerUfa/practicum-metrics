@@ -41,30 +41,18 @@ func Uint[T cstr.Unsigned](v T) *Value {
 }
 
 func (v *Value) IsString() bool {
-	if v.kind != valueKindString {
-		return false
-	}
-	return true
+	return v.kind == valueKindString
 }
 func (v *Value) IsFloat() bool {
-	if v.kind != valueKindFloat64 {
-		return false
-	}
-	return true
+	return v.kind == valueKindFloat64
 }
 
 func (v *Value) IsInt() bool {
-	if v.kind != valueKindInt64 {
-		return false
-	}
-	return true
+	return v.kind == valueKindInt64
 }
 
 func (v *Value) IsUint() bool {
-	if v.kind != valueKindUint64 {
-		return false
-	}
-	return true
+	return v.kind == valueKindUint64
 }
 
 func (v *Value) ToString() (out *Value, ok bool) {
