@@ -1,4 +1,4 @@
-package json_metric
+package jmetric
 
 type Metrics struct {
 	ID    string   `json:"id"`

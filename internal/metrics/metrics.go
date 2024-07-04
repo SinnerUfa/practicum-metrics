@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/SinnerUfa/practicum-metric/internal/api/json_metric"
+	jmetric "github.com/SinnerUfa/practicum-metric/internal/api/jmetric"
 )
 
 type MetricType string
@@ -32,8 +32,8 @@ func (m Metric) ReguestString(head string) string {
 }
 
 func (m *Metric) UnmarshalJSON(data []byte) (err error) {
-	type VisitorAlias json_metric.Metrics
-	jm := json_metric.New()
+	type VisitorAlias jmetric.Metrics
+	jm := jmetric.New()
 	alias := &struct {
 		*VisitorAlias
 		Delta int64   `json:"delta,omitempty"`
@@ -58,7 +58,7 @@ func (m *Metric) UnmarshalJSON(data []byte) (err error) {
 }
 
 func (m Metric) MarshalJSON() (data []byte, err error) {
-	jm := json_metric.New()
+	jm := jmetric.New()
 	jm.ID = m.Name
 	jm.MType = string(m.Type)
 	switch m.Type {
