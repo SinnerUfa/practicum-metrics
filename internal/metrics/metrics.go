@@ -64,10 +64,13 @@ func (m Metric) MarshalJSON() (data []byte, err error) {
 	switch m.Type {
 	case MetricTypeGauge:
 		*(jm.Value), _ = m.Value.Float64()
+		jm.Delta = nil
 	case MetricTypeCounter:
 		*(jm.Delta), _ = m.Value.Int64()
+		jm.Value = nil
 	default:
-		*(jm.Value) = 0
+		jm.Value = nil
+		jm.Delta = nil
 	}
 	return json.Marshal(*jm)
 }

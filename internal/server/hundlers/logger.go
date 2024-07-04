@@ -1,18 +1,17 @@
 package hundlers
 
 import (
+	"bytes"
+	"io"
 	"log/slog"
 	"net/http"
 	"time"
 )
 
-type responseData struct {
-	status int
-	size   int
-}
 type logWriter struct {
 	http.ResponseWriter
-	responseData *responseData
+	status int
+	buf    *bytes.Buffer
 }
 
 func (w *logWriter) Header() http.Header {
@@ -20,14 +19,13 @@ func (w *logWriter) Header() http.Header {
 }
 
 func (w *logWriter) Write(b []byte) (int, error) {
-	size, err := w.ResponseWriter.Write(b)
-	w.responseData.size += size
-	return size, err
+	mw := io.MultiWriter(w.ResponseWriter, w.buf)
+	return mw.Write(b)
 }
 
 func (w *logWriter) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
-	w.responseData.status = statusCode
+	w.status = statusCode
 }
 
 func Logger(log *slog.Logger) func(http.Handler) http.Handler {
@@ -35,15 +33,26 @@ func Logger(log *slog.Logger) func(http.Handler) http.Handler {
 		hundler := func(w http.ResponseWriter, r *http.Request) {
 			lw := &logWriter{
 				ResponseWriter: w,
-				responseData:   &responseData{},
+				buf:            bytes.NewBuffer(make([]byte, 512)),
 			}
 			start := time.Now()
 			h.ServeHTTP(lw, r)
+
+			var buf bytes.Buffer
+
+			if r.Body != nil {
+				buf.ReadFrom(r.Body)
+			}
 			log.Info("",
-				slog.Group("request", slog.String("method", r.Method), slog.String("url", r.RequestURI)),
-				slog.Group("response", slog.Int("status", lw.responseData.status), slog.Int("size", lw.responseData.size)),
-				slog.Duration("duration", time.Since(start)),
-			)
+				slog.Group("request",
+					slog.String("method", r.Method),
+					slog.String("url", r.RequestURI),
+					slog.String("body", buf.String())),
+				slog.Group("response",
+					slog.Int("status", lw.status),
+					slog.Int("size", lw.buf.Len()),
+					slog.String("body", lw.buf.String())),
+				slog.Duration("duration", time.Since(start)))
 		}
 		return http.HandlerFunc(hundler)
 	}

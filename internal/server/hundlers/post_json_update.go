@@ -27,8 +27,6 @@ func PostJSONUpdate(log *slog.Logger, rep repository.Repository) http.HandlerFun
 				log.Warn("", "err", codes.ErrPostBadBody)
 				return
 			}
-			b := buf.Bytes()
-			log.Info("", "b", string(b))
 			metr := &metrics.Metric{}
 			if err = json.Unmarshal(buf.Bytes(), metr); err != nil {
 				http.Error(w, codes.ErrPostUnmarshal.Error(), http.StatusBadRequest)
