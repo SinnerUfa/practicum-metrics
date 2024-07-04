@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"fmt"
 	"reflect"
 	"runtime"
 )
@@ -22,15 +21,23 @@ func Parse(v any) (m []Metric) {
 	for i := 0; i < structType.NumField(); i++ {
 		fieldValue := structValue.Field(i)
 		fieldType := structType.Field(i)
-
+		var v *Value
 		switch fieldType.Type.Kind() {
 		case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8:
-			fallthrough
+			v = Uint(fieldValue.Uint())
 		case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
-			fallthrough
+			v = Int(fieldValue.Int())
 		case reflect.Float32, reflect.Float64:
-			m = append(m, Metric{Name: fieldType.Name, Type: "gauge", Value: fmt.Sprint(fieldValue)})
+			v = Float(fieldValue.Float())
 		}
+		if v == nil {
+			continue
+		}
+		m = append(m, Metric{
+			Name:  fieldType.Name,
+			Type:  MetricTypeGauge,
+			Value: v,
+		})
 	}
 	return
 }

@@ -1,9 +1,6 @@
 package memory
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
 	"sync"
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
@@ -28,10 +25,13 @@ func New() *Memory {
 func (mem *Memory) Set(m metrics.Metric) error {
 	mem.Lock()
 	defer mem.Unlock()
+	if m.Name == "" {
+		return codes.ErrRepMetricNotSupported
+	}
 	switch m.Type {
-	case "counter":
-		v, err := strconv.ParseInt(m.Value, 10, 64)
-		if err != nil {
+	case metrics.MetricTypeCounter:
+		v, ok := m.Value.Int64()
+		if !ok {
 			return codes.ErrRepParseInt
 		}
 		if _, ok := mem.Counters[m.Name]; !ok {
@@ -39,9 +39,9 @@ func (mem *Memory) Set(m metrics.Metric) error {
 		}
 		mem.Counters[m.Name].Set(v)
 
-	case "gauge":
-		v, err := strconv.ParseFloat(m.Value, 64)
-		if err != nil {
+	case metrics.MetricTypeGauge:
+		v, ok := m.Value.Float64()
+		if !ok {
 			return codes.ErrRepParseFloat
 		}
 		if _, ok := mem.Gauges[m.Name]; !ok {
@@ -58,18 +58,18 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 	mem.RLock()
 	defer mem.RUnlock()
 	switch m.Type {
-	case "counter":
+	case metrics.MetricTypeCounter:
 		c, ok := mem.Counters[m.Name]
 		if !ok {
 			return codes.ErrRepNotFound
 		}
-		m.Value = fmt.Sprint(c.Value())
-	case "gauge":
+		m.Value = metrics.Int(c.Value())
+	case metrics.MetricTypeGauge:
 		g, ok := mem.Gauges[m.Name]
 		if !ok {
 			return codes.ErrRepNotFound
 		}
-		m.Value = TrimFloat(g.Value())
+		m.Value = metrics.Float(g.Value())
 	default:
 		return codes.ErrRepMetricNotSupported
 	}
@@ -80,10 +80,10 @@ func (mem *Memory) List() (out []metrics.Metric) {
 	mem.RLock()
 	defer mem.RUnlock()
 	for k, v := range mem.Counters {
-		out = append(out, metrics.Metric{Name: k, Value: fmt.Sprint(v.Value()), Type: "counter"})
+		out = append(out, metrics.Metric{Name: k, Value: metrics.Int(v.Value()), Type: metrics.MetricTypeCounter})
 	}
 	for k, v := range mem.Gauges {
-		out = append(out, metrics.Metric{Name: k, Value: TrimFloat(v.Value()), Type: "gauge"})
+		out = append(out, metrics.Metric{Name: k, Value: metrics.Float(v.Value()), Type: metrics.MetricTypeGauge})
 	}
 	return
 }
@@ -95,13 +95,4 @@ func (mem *Memory) SetList(in []metrics.Metric) error {
 		}
 	}
 	return nil
-}
-
-func TrimFloat(v float64) string {
-	s := strings.Split(fmt.Sprintf("%.5f", v), ".")
-	s[1] = strings.TrimRight(s[1], ". 0")
-	if s[1] == "" {
-		return s[0]
-	}
-	return strings.Join(s, ".")
 }

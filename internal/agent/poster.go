@@ -24,11 +24,10 @@ func (m *MetricPost) Post() error {
 	l := m.rep.List()
 	client := resty.New()
 
-	endpoint := "http://" + m.adress + "/"
+	endpoint := "http://" + m.adress + "/update/"
 
 	for _, v := range l {
-
-		_, err := client.R().SetHeader("Content-Type", "text/plain").Post(endpoint + v.ReguestString("update"))
+		_, err := client.R().SetHeader("Content-Type", "application/json").SetBody(v).Post(endpoint)
 		if err != nil {
 			m.log.Warn("", "err", err)
 			return err

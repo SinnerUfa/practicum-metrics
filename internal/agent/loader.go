@@ -1,7 +1,6 @@
 package agent
 
 import (
-	"fmt"
 	"log/slog"
 	"math/rand"
 
@@ -22,9 +21,9 @@ func NewLoader(log *slog.Logger, rep repository.Repository) *MetricLoad {
 func (m *MetricLoad) Load() error {
 	l := metrics.GetRuntimeMetrics()
 
-	l = append(l, metrics.Metric{Name: "PollCount", Type: "counter", Value: fmt.Sprint(m.counter)})
+	l = append(l, metrics.Metric{Name: "PollCount", Type: metrics.MetricTypeCounter, Value: metrics.Uint(m.counter)})
 	m.counter++
-	l = append(l, metrics.Metric{Name: "RandomValue", Type: "gauge", Value: fmt.Sprint(rand.Int())})
+	l = append(l, metrics.Metric{Name: "RandomValue", Type: metrics.MetricTypeGauge, Value: metrics.Int(rand.Int())})
 
 	m.rep.SetList(l)
 	m.log.Info("load metrics", "increment", m.counter)

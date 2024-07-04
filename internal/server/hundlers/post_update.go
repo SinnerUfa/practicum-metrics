@@ -10,7 +10,7 @@ import (
 	chi "github.com/go-chi/chi/v5"
 )
 
-func PostValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
+func PostUpdate(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			name := chi.URLParam(r, "name")
@@ -18,8 +18,8 @@ func PostValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 			value := chi.URLParam(r, "value")
 			metr := &metrics.Metric{
 				Name:  name,
-				Type:  typ,
-				Value: value,
+				Type:  metrics.MetricType(typ),
+				Value: metrics.String(value),
 			}
 			if name == "" {
 				http.Error(w, codes.ErrPostValReqName.Error(), http.StatusBadRequest)

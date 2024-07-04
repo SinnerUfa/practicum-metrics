@@ -1,20 +1,18 @@
 {{ define "body"}}
-
-<div >
-    <table >
-        <thead>
-            <tr><th>Name</th><th>Type</th><th>Value</th></tr>
-        </thead>
-        <tbody>
-            {{ range . }}
+    <div >
+        <table >
+            <thead>
+                <tr><th>Name</th><th>Type</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                {{ range . }}
                     <tr>
                         <td>{{ .Name }}</td>
                         <td>{{ .Type }}</td>
-                        <td>{{ .Value }}</td>
+                        <td>{{ .Value | valueString}}</td>
                     </tr>
-            {{ end }}
-        </tbody>
-    </table>
-</div>
-
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
 {{ end }}

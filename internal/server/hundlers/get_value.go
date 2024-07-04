@@ -17,7 +17,7 @@ func GetValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 			typ := chi.URLParam(r, "type")
 			metr := &metrics.Metric{
 				Name: name,
-				Type: typ,
+				Type: metrics.MetricType(typ),
 			}
 			if name == "" {
 				http.Error(w, codes.ErrGetValReqName.Error(), http.StatusBadRequest)
@@ -43,6 +43,6 @@ func GetValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 
 			w.Header().Set("Content-type", "text/plain")
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(metr.Value))
+			w.Write([]byte(metr.Value.String()))
 		})
 }

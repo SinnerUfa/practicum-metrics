@@ -37,4 +37,9 @@ var (
 	// server
 	ErrSrvListen   = errors.New("error listening and serving")
 	ErrSrvShutdown = errors.New("error shutdown")
+	// post json
+	ErrPostNotJSON   = errors.New("bad request - request not JSON")
+	ErrPostBadBody   = errors.New("bad request - bad body")
+	ErrPostMarshal   = errors.New("error of marshaling")
+	ErrPostUnmarshal = errors.New("error of unmarshaling")
 )

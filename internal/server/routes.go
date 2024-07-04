@@ -15,8 +15,10 @@ func Routes(log *slog.Logger, rep repository.Repository) http.Handler {
 	r.Use(hundlers.Logger(log))
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", hundlers.GetList(log, rep))
-		r.Post("/update/{type}/{name}/{value}", hundlers.PostValue(log, rep))
+		r.Post("/update/{type}/{name}/{value}", hundlers.PostUpdate(log, rep))
 		r.Get("/value/{type}/{name}", hundlers.GetValue(log, rep))
+		r.Post("/update/", hundlers.PostJSONUpdate(log, rep))
+		r.Post("/value/", hundlers.PostJSONValue(log, rep))
 	})
 	return r
 }

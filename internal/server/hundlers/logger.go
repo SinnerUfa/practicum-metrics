@@ -21,7 +21,7 @@ func (w *logWriter) Header() http.Header {
 
 func (w *logWriter) Write(b []byte) (int, error) {
 	size, err := w.ResponseWriter.Write(b)
-	w.responseData.size = size
+	w.responseData.size += size
 	return size, err
 }
 
@@ -49,33 +49,3 @@ func Logger(log *slog.Logger) func(http.Handler) http.Handler {
 	}
 	return mid
 }
-
-// Сведения о запросах должны содержать URI, метод запроса и время, затраченное на его выполнение.
-// Сведения об ответах должны содержать код статуса и размер содержимого ответа.
-
-// func WithLogging(h http.Handler) http.Handler {
-//     logFn := func(w http.ResponseWriter, r *http.Request) {
-//         start := time.Now()
-
-//         responseData := &responseData {
-//             status: 0,
-//             size: 0,
-//         }
-//         lw := loggingResponseWriter {
-//             ResponseWriter: w, // встраиваем оригинальный http.ResponseWriter
-//             responseData: responseData,
-//         }
-//         h.ServeHTTP(&lw, r) // внедряем реализацию http.ResponseWriter
-
-//         duration := time.Since(start)
-
-//         sugar.Infoln(
-//             "uri", r.RequestURI,
-//             "method", r.Method,
-//             "status", responseData.status, // получаем перехваченный код статуса ответа
-//             "duration", duration,
-//             "size", responseData.size, // получаем перехваченный размер ответа
-//         )
-//     }
-//     return http.HandlerFunc(logFn)
-// }
