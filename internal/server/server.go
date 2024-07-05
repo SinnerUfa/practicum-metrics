@@ -19,13 +19,11 @@ func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
 	if err != nil {
 		log.Warn("", "err", codes.ErrDecompressor, "gzerr", err)
 	}
-	defer gzr.Close()
 
 	gzw, err := gzip.NewWriterLevel(&buf, gzip.BestSpeed)
 	if err != nil {
 		log.Warn("", "err", codes.ErrCompressor, "gzerr", err)
 	}
-	defer gzw.Close()
 
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
