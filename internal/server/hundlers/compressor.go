@@ -19,7 +19,6 @@ func (w gzipWriter) Write(b []byte) (int, error) {
 func Compressor(log *slog.Logger, gz *gzip.Writer) func(http.Handler) http.Handler {
 	mid := func(h http.Handler) http.Handler {
 		hundler := func(w http.ResponseWriter, r *http.Request) {
-			gz.Reset(w)
 			if ct := r.Header.Get("Content-Type"); ct != "application/json" && ct != "text/html" {
 				h.ServeHTTP(w, r)
 				return
@@ -28,6 +27,7 @@ func Compressor(log *slog.Logger, gz *gzip.Writer) func(http.Handler) http.Handl
 				h.ServeHTTP(w, r)
 				return
 			}
+			gz.Reset(w)
 			w.Header().Set("Content-Encoding", "gzip")
 			h.ServeHTTP(gzipWriter{ResponseWriter: w, Writer: gz}, r)
 		}
