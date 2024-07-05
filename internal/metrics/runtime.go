@@ -29,6 +29,8 @@ func Parse(v any) (m []Metric) {
 			v = Int(fieldValue.Int())
 		case reflect.Float32, reflect.Float64:
 			v = Float(fieldValue.Float())
+		default:
+			v = nil
 		}
 		if v == nil {
 			continue
