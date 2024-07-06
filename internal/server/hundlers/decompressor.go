@@ -27,7 +27,7 @@ type gzReader struct {
 func Decompressor(log *slog.Logger, gz *gzip.Reader) func(http.Handler) http.Handler {
 	mid := func(h http.Handler) http.Handler {
 		hundler := func(w http.ResponseWriter, r *http.Request) {
-			log.Info("", "Decompressor", 0)
+			// log.Info("", "Decompressor", 0)
 			// if ct := r.Header.Get("Content-Type"); (ct == "application/json" || ct == "text/html") &&
 			// 	strings.Contains(r.Header.Get("Content-Encoding"), "gzip") {
 			// 	gz.Reset(r.Body)
@@ -40,7 +40,7 @@ func Decompressor(log *slog.Logger, gz *gzip.Reader) func(http.Handler) http.Han
 			// }
 			h.ServeHTTP(w, r)
 
-			log.Info("", "Decompressor", 1)
+			// log.Info("", "Decompressor", 1)
 		}
 		return http.HandlerFunc(hundler)
 	}
