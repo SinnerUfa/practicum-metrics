@@ -3,7 +3,6 @@ package hundlers
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -40,10 +39,10 @@ func Logger(log *slog.Logger) func(http.Handler) http.Handler {
 			body := ""
 			if r.Body != nil {
 				b, _ := io.ReadAll(r.Body)
-				// r.Body.Close()
+				r.Body.Close()
 				buf := bytes.NewBuffer(b)
 				body = buf.String()
-				r.Body = ioutil.NopCloser(buf)
+				r.Body = io.NopCloser(buf)
 			}
 
 			h.ServeHTTP(lw, r)

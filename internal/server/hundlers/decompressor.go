@@ -12,16 +12,16 @@ type gzReader struct {
 	zr *gzip.Reader
 }
 
-func (g gzReader) Read(p []byte) (n int, err error) {
-	return g.zr.Read(p)
-}
+// func (g gzReader) Read(p []byte) (n int, err error) {
+// 	return g.zr.Read(p)
+// }
 
-func (c *gzReader) Close() error {
-	if err := c.r.Close(); err != nil {
-		return err
-	}
-	return c.zr.Close()
-}
+// func (c *gzReader) Close() error {
+// 	if err := c.r.Close(); err != nil {
+// 		return err
+// 	}
+// 	return c.zr.Close()
+// }
 
 func Decompressor(log *slog.Logger, gz *gzip.Reader) func(http.Handler) http.Handler {
 	mid := func(h http.Handler) http.Handler {

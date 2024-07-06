@@ -35,7 +35,6 @@ func (m *MetricPost) Post() (err error) {
 			m.log.Warn("", "err", err, "i", i, "value", v)
 		}
 	}
-	return
 	m.log.Info("Post metrics", "increment", m.counter)
 	return nil
 }
