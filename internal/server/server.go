@@ -7,12 +7,18 @@ import (
 	"log/slog"
 	"net/http"
 
+	filer "github.com/SinnerUfa/practicum-metric/internal/filer"
+
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
 func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
 	rep := repository.New()
+	if cfg.Restore {
+		filer.Load(cfg.FileStoragePath, log, rep)
+	}
+	rep = filer.Save(ctx, cfg.FileStoragePath, 10 /*cfg.StoreInterval*/, log, rep)
 
 	var buf bytes.Buffer
 	gzw, _ := gzip.NewWriterLevel(&buf, gzip.BestCompression)

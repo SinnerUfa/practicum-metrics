@@ -4,6 +4,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 )
@@ -72,6 +73,15 @@ func SetEnv(field reflect.Value, value string) error {
 			return codes.ErrEnvFieldParseInt
 		}
 		field.SetInt(newValaue)
+	case reflect.Bool:
+		switch strings.ToLower(value) {
+		case "true":
+			field.SetBool(true)
+		case "false":
+			field.SetBool(false)
+		default:
+			field.SetBool(false)
+		}
 	default:
 		return codes.ErrEnvFieldNotSupported
 	}

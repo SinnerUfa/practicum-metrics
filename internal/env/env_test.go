@@ -113,6 +113,7 @@ func Test_Load(t *testing.T) {
 			D uint   `env:""`
 			E uint   `env:"-"`
 			F uint
+			G bool `env:"G"`
 		}
 
 		type test struct {
@@ -123,10 +124,10 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				[]testArg{
-					{"A", "11"}, {"B", "21"}, {"C", "31"}, {"D", "41"}, {"E", "51"}, {"F", "61"},
+					{"A", "11"}, {"B", "21"}, {"C", "31"}, {"D", "41"}, {"E", "51"}, {"F", "61"}, {"G", "true"},
 				},
 				testValue{
-					11, 21, "31", 4, 5, 6,
+					11, 21, "31", 4, 5, 6, true,
 				},
 			},
 		}
@@ -138,6 +139,7 @@ func Test_Load(t *testing.T) {
 				D: 4,
 				E: 5,
 				F: 6,
+				G: false,
 			}
 
 			for _, a := range test.args {

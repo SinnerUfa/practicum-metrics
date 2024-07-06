@@ -104,10 +104,13 @@ func Test_Load(t *testing.T) {
 		type testValue struct {
 			A uint   `flag:"A"`
 			B int    `flag:"B"`
+			G bool   `flag:"G"`
 			C string `flag:"C"`
 			D uint   `flag:""`
 			E uint   `flag:"-"`
 			F uint
+			J bool `flag:"J"`
+			K bool `flag:"K"`
 		}
 
 		type test struct {
@@ -118,10 +121,10 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				[]string{
-					"-A", "11", "-B", "21", "-C", "31",
+					"-A", "11", "-B", "21", "-C", "31", "-G", "false", "-J", "true", "-K", "",
 				},
 				testValue{
-					11, 21, "31", 4, 5, 6,
+					A: 11, B: 21, C: "31", D: 4, E: 5, F: 6, G: false, J: true, K: false,
 				},
 			},
 		}
@@ -133,6 +136,9 @@ func Test_Load(t *testing.T) {
 				D: 4,
 				E: 5,
 				F: 6,
+				G: true,
+				J: false,
+				K: true,
 			}
 
 			err := Load(&in, test.args)

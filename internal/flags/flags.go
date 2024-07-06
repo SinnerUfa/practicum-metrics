@@ -3,6 +3,7 @@ package flags
 import (
 	"flag"
 	"reflect"
+	"strings"
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 )
@@ -70,6 +71,13 @@ func createFlags(f *flag.FlagSet, list map[int]Flag) error {
 			tmp.ptr = f.String(tmp.name, tmp.value.String(), tmp.usage)
 		case reflect.Int:
 			tmp.ptr = f.Int(tmp.name, int(tmp.value.Int()), tmp.usage)
+		case reflect.Bool:
+			if tmp.value.Bool() {
+				tmp.ptr = f.String(tmp.name, "true", tmp.usage)
+			} else {
+				tmp.ptr = f.String(tmp.name, "false", tmp.usage)
+			}
+
 		default:
 			return codes.ErrFlgFieldNotSupported
 		}
@@ -97,6 +105,13 @@ func setFlags(v reflect.Value, list map[int]Flag) error {
 			fieldValue.SetString(value.String())
 		case reflect.Int:
 			fieldValue.SetInt(value.Int())
+		case reflect.Bool:
+			if strings.ToLower(value.String()) != "true" {
+				fieldValue.SetBool(false)
+			} else {
+				fieldValue.SetBool(true)
+			}
+
 		default:
 			return codes.ErrFlgFieldNotSupported
 		}
