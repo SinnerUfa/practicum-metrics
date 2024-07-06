@@ -3,15 +3,17 @@ package hundlers
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 )
 
 type logWriter struct {
 	http.ResponseWriter
 	status int
-	buf    *bytes.Buffer
+	buf    bytes.Buffer
 }
 
 func (w *logWriter) Header() http.Header {
@@ -19,13 +21,13 @@ func (w *logWriter) Header() http.Header {
 }
 
 func (w *logWriter) Write(b []byte) (int, error) {
-	mw := io.MultiWriter(w.ResponseWriter, w.buf)
+	mw := io.MultiWriter(w.ResponseWriter, &(w.buf))
 	return mw.Write(b)
 }
 
 func (w *logWriter) WriteHeader(statusCode int) {
-	w.ResponseWriter.WriteHeader(statusCode)
 	w.status = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
 }
 
 func Logger(log *slog.Logger) func(http.Handler) http.Handler {
@@ -33,25 +35,30 @@ func Logger(log *slog.Logger) func(http.Handler) http.Handler {
 		hundler := func(w http.ResponseWriter, r *http.Request) {
 			lw := &logWriter{
 				ResponseWriter: w,
-				buf:            bytes.NewBuffer(make([]byte, 512)),
 			}
 			start := time.Now()
-			h.ServeHTTP(lw, r)
-
-			var buf bytes.Buffer
-
+			body := ""
 			if r.Body != nil {
-				buf.ReadFrom(r.Body)
+				b, _ := io.ReadAll(r.Body)
+				// r.Body.Close()
+				buf := bytes.NewBuffer(b)
+				body = buf.String()
+				r.Body = ioutil.NopCloser(buf)
 			}
+
+			h.ServeHTTP(lw, r)
 			log.Info("",
 				slog.Group("request",
 					slog.String("method", r.Method),
 					slog.String("url", r.RequestURI),
-					slog.String("body", buf.String())),
+					slog.String("content-type", strings.Join(r.Header.Values("Content-Type"), ";")),
+					slog.String("content-encoding", strings.Join(r.Header.Values("Content-Encoding"), ";")),
+					slog.String("accept-encoding", strings.Join(r.Header.Values("Accept-Encoding"), ";")),
+					slog.String("body", body)),
 				slog.Group("response",
 					slog.Int("status", lw.status),
 					slog.Int("size", lw.buf.Len()),
-					/*slog.String("body", lw.buf.String())*/),
+					slog.String("body", lw.buf.String())),
 				slog.Duration("duration", time.Since(start)))
 		}
 		return http.HandlerFunc(hundler)

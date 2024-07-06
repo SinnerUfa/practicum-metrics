@@ -20,20 +20,22 @@ func NewPoster(ctx context.Context, log *slog.Logger, rep repository.Repository,
 	return &MetricPost{ctx: ctx, log: log, rep: rep, adress: adress}
 }
 
-func (m *MetricPost) Post() error {
+func (m *MetricPost) Post() (err error) {
 	l := m.rep.List()
 	client := resty.New()
 
 	endpoint := "http://" + m.adress + "/update/"
-
-	for _, v := range l {
-		_, err := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip").SetBody(v).Post(endpoint)
+	m.log.Info("", "l", l)
+	for i, v := range l {
+		req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip").SetBody(v)
+		p, err := req.Post(endpoint)
+		m.log.Info("", "req.Body", req.Body)
+		m.log.Info("", "content-encoding", p.Header().Get("Content-Encoding"), "response", p.String())
 		if err != nil {
-			m.log.Warn("", "err", err)
-			return err
+			m.log.Warn("", "err", err, "i", i, "value", v)
 		}
-
 	}
+	return
 	m.log.Info("Post metrics", "increment", m.counter)
 	return nil
 }

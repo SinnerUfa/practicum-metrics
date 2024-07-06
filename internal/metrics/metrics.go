@@ -32,14 +32,13 @@ func (m Metric) ReguestString(head string) string {
 }
 
 func (m *Metric) UnmarshalJSON(data []byte) (err error) {
-	type VisitorAlias jmetric.Metrics
 	jm := jmetric.New()
 	alias := &struct {
-		*VisitorAlias
+		*jmetric.Metrics
 		Delta int64   `json:"delta,omitempty"`
 		Value float64 `json:"value,omitempty"`
 	}{
-		VisitorAlias: (*VisitorAlias)(jm),
+		Metrics: jm,
 	}
 	if err = json.Unmarshal(data, alias); err != nil {
 		return

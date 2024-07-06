@@ -15,14 +15,15 @@ func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
 	rep := repository.New()
 
 	var buf bytes.Buffer
-	gzr, err := gzip.NewReader(&buf)
+	gzw, _ := gzip.NewWriterLevel(&buf, gzip.BestCompression)
+	_, err := gzw.Write([]byte(" "))
 	if err != nil {
-		log.Warn("", "err", codes.ErrDecompressor, "gzerr", err)
+		log.Warn("", "err", codes.ErrCompressor, "gzerr", err, "gzw", gzw)
 	}
 
-	gzw, err := gzip.NewWriterLevel(&buf, gzip.BestSpeed)
+	gzr, err := gzip.NewReader(&buf)
 	if err != nil {
-		log.Warn("", "err", codes.ErrCompressor, "gzerr", err)
+		log.Warn("", "err", codes.ErrDecompressor, "gzerr", err, "gzr", gzr)
 	}
 
 	httpServer := &http.Server{

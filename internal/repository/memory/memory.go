@@ -23,8 +23,6 @@ func New() *Memory {
 }
 
 func (mem *Memory) Set(m metrics.Metric) error {
-	mem.Lock()
-	defer mem.Unlock()
 	if m.Name == "" {
 		return codes.ErrRepMetricNotSupported
 	}
@@ -34,20 +32,23 @@ func (mem *Memory) Set(m metrics.Metric) error {
 		if !ok {
 			return codes.ErrRepParseInt
 		}
+		mem.Lock()
 		if _, ok := mem.Counters[m.Name]; !ok {
 			mem.Counters[m.Name] = &cnt.Counter{}
 		}
 		mem.Counters[m.Name].Set(v)
-
+		mem.Unlock()
 	case metrics.MetricTypeGauge:
 		v, ok := m.Value.Float64()
 		if !ok {
 			return codes.ErrRepParseFloat
 		}
+		mem.Lock()
 		if _, ok := mem.Gauges[m.Name]; !ok {
 			mem.Gauges[m.Name] = &gau.Gauge{}
 		}
 		mem.Gauges[m.Name].Set(v)
+		mem.Unlock()
 	default:
 		return codes.ErrRepMetricNotSupported
 	}
@@ -55,17 +56,19 @@ func (mem *Memory) Set(m metrics.Metric) error {
 }
 
 func (mem *Memory) Get(m *metrics.Metric) error {
-	mem.RLock()
-	defer mem.RUnlock()
 	switch m.Type {
 	case metrics.MetricTypeCounter:
+		mem.RLock()
 		c, ok := mem.Counters[m.Name]
+		mem.RUnlock()
 		if !ok {
 			return codes.ErrRepNotFound
 		}
 		m.Value = metrics.Int(c.Value())
 	case metrics.MetricTypeGauge:
+		mem.RLock()
 		g, ok := mem.Gauges[m.Name]
+		mem.RUnlock()
 		if !ok {
 			return codes.ErrRepNotFound
 		}
