@@ -1,4 +1,4 @@
-package filer
+package unloader
 
 import (
 	"context"
@@ -78,6 +78,7 @@ func Save(ctx context.Context, file string, intrv uint, log *slog.Logger, rep re
 		file,
 		log,
 	}
-	ticker.NewAndRun(ctx, intrv>>1, t)
+	// ticker.NewAndRun(ctx, intrv>>1, t)
+	ticker.NewAndRun(ctx, intrv, t)
 	return rep
 }

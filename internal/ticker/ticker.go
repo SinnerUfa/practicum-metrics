@@ -16,10 +16,11 @@ func NewAndRun(ctx context.Context, interval uint, s SlaveTicker) {
 
 		for {
 			select {
-			case <-ctx.Done():
-				return
 			case <-ticker.C:
 				s.Tick()
+			case <-ctx.Done():
+				s.Tick()
+				return
 			}
 		}
 	}(interval, s)
