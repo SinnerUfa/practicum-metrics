@@ -21,6 +21,7 @@ func Routes(log *slog.Logger, rep repository.Repository, gzr *gzip.Reader, gzw *
 	r.Use(hundlers.Logger(log))
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", hundlers.GetList(log, rep))
+		r.Get("/ping", hundlers.GetPing(log, rep))
 		r.Post("/update/{type}/{name}/{value}", hundlers.PostUpdate(log, rep))
 		r.Get("/value/{type}/{name}", hundlers.GetValue(log, rep))
 		r.Post("/update/", hundlers.PostJSONUpdate(log, rep))
