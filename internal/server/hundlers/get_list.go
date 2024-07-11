@@ -1,9 +1,13 @@
 package hundlers
 
 import (
+	"cmp"
 	"html/template"
 	"log/slog"
 	"net/http"
+	"strings"
+
+	"golang.org/x/exp/slices"
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
@@ -56,6 +60,9 @@ func GetList(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 				return
 			}
 			metrs := rep.List()
+			slices.SortFunc(metrs, func(a, b metrics.Metric) int {
+				return cmp.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name))
+			})
 			w.Header().Set("Content-type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusOK)
 			t.Execute(w, metrs)
