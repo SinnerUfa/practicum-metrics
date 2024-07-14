@@ -18,7 +18,7 @@ func NewLoader(log *slog.Logger, rep repository.Repository) *MetricLoad {
 	return &MetricLoad{log: log, rep: rep}
 }
 
-func (m *MetricLoad) Load() error {
+func (m *MetricLoad) Load() {
 	l := metrics.GetRuntimeMetrics()
 
 	l = append(l, metrics.Metric{Name: "PollCount", Type: metrics.MetricTypeCounter, Value: metrics.Uint(m.counter)})
@@ -27,9 +27,8 @@ func (m *MetricLoad) Load() error {
 
 	m.rep.SetList(l)
 	m.log.Info("load metrics", "increment", m.counter)
-	return nil
 }
 
-func (m *MetricLoad) Tick() error {
-	return m.Load()
+func (m *MetricLoad) Tick() {
+	m.Load()
 }

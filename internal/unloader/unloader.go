@@ -60,13 +60,12 @@ type repTicker struct {
 	log  *slog.Logger
 }
 
-func (rp repTicker) Tick() error {
+func (rp repTicker) Tick() {
 	mem := rp.rep.List()
 	if len(mem) != 0 {
 		ship(rp.file, mem)
 	}
 	rp.log.Info("Tick")
-	return nil
 }
 
 func Save(ctx context.Context, file string, intrv uint, log *slog.Logger, rep repository.Repository) repository.Repository {
@@ -78,7 +77,6 @@ func Save(ctx context.Context, file string, intrv uint, log *slog.Logger, rep re
 		file,
 		log,
 	}
-	// ticker.NewAndRun(ctx, intrv>>1, t)
 	ticker.NewAndRun(ctx, intrv, t)
 	return rep
 }

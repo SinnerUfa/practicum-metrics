@@ -6,7 +6,7 @@ import (
 )
 
 type SlaveTicker interface {
-	Tick() error
+	Tick()
 }
 
 func NewAndRun(ctx context.Context, interval uint, s SlaveTicker) {

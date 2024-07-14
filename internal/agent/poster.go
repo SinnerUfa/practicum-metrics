@@ -20,7 +20,7 @@ func NewPoster(ctx context.Context, log *slog.Logger, rep repository.Repository,
 	return &MetricPost{ctx: ctx, log: log, rep: rep, adress: adress}
 }
 
-func (m *MetricPost) Post() (err error) {
+func (m *MetricPost) Post() {
 	l := m.rep.List()
 	client := resty.New()
 
@@ -36,9 +36,8 @@ func (m *MetricPost) Post() (err error) {
 		}
 	}
 	m.log.Info("Post metrics", "increment", m.counter)
-	return nil
 }
 
-func (m *MetricPost) Tick() error {
-	return m.Post()
+func (m *MetricPost) Tick() {
+	m.Post()
 }

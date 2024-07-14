@@ -18,6 +18,7 @@ func main() {
 
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {
 		log.Error("", "err", err)
+		return
 	}
 	log.Info("", "cfg", cfg)
 

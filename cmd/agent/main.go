@@ -12,13 +12,14 @@ import (
 	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 )
 
-var cfg agent.Config = agent.DefaultConfig
+var cfg = agent.DefaultConfig
 
 func main() {
 
 	log := mlog.New(mlog.SlogType)
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {
 		log.Error("", "err", err)
+		return
 	}
 	log.Info("", "cfg", cfg)
 
