@@ -1,6 +1,7 @@
 package hundlers
 
 import (
+	"bytes"
 	"compress/gzip"
 	"io"
 	"log/slog"
@@ -17,7 +18,17 @@ type gzipWriter struct {
 func (w gzipWriter) Write(b []byte) (int, error) {
 	return w.Writer.Write(b)
 }
-func Compressor(log *slog.Logger, gz *gzip.Writer) func(http.Handler) http.Handler {
+func Compressor(log *slog.Logger) func(http.Handler) http.Handler {
+	var buf bytes.Buffer
+
+	gz, _ := gzip.NewWriterLevel(&buf, gzip.BestCompression)
+	// _, err := gz.Write([]byte(" "))
+
+	// if err != nil {
+	// 	log.Warn("", "err", codes.ErrCompressor, "gz_err", err)
+
+	// }
+
 	mid := func(h http.Handler) http.Handler {
 		hundler := func(w http.ResponseWriter, r *http.Request) {
 			if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
