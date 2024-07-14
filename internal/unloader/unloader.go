@@ -16,18 +16,16 @@ import (
 func Load(file string, log *slog.Logger, rep repository.Repository) {
 	var out []metrics.Metric
 	b, err := os.ReadFile(file)
-	if err != nil {
+	if err != nil || len(b) == 0 {
+		log.Info("load error")
 		return
 	}
 	err = json.Unmarshal(b, &out)
 	if err != nil {
-		log.Info("fail1", "err", err)
+		log.Info("load", "unmarshal err", err)
 		return
 	}
-	if len(out) != 0 {
-		log.Info("fail2")
-		rep.SetList(out)
-	}
+
 	log.Info("loaded", "mem", rep.List())
 }
 
