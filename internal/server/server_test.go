@@ -1,8 +1,6 @@
 package server
 
 import (
-	"bytes"
-	"compress/gzip"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -113,22 +111,12 @@ func Test_Hundlers(t *testing.T) {
 	}
 	rep := repository.New()
 	log := mlog.New(mlog.SlogType)
-	var buf bytes.Buffer
-	gzr, err := gzip.NewReader(&buf)
-	if err != nil {
-		log.Warn("", "err", codes.ErrDecompressor, "gzerr", err)
-	}
-
-	gzw, err := gzip.NewWriterLevel(&buf, gzip.BestSpeed)
-	if err != nil {
-		log.Warn("", "err", codes.ErrCompressor, "gzerr", err)
-	}
 
 	for _, test := range testsGetVoid {
 		t.Run("testsGetVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(log, rep, gzr, gzw).ServeHTTP(w, request)
+			Routes(log, rep).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -145,7 +133,7 @@ func Test_Hundlers(t *testing.T) {
 		t.Run("testsPostVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(log, rep, gzr, gzw).ServeHTTP(w, request)
+			Routes(log, rep).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -164,7 +152,7 @@ func Test_Hundlers(t *testing.T) {
 		t.Run("testsGet", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(log, rep, gzr, gzw).ServeHTTP(w, request)
+			Routes(log, rep).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -180,4 +168,3 @@ func Test_Hundlers(t *testing.T) {
 	}
 	log.Info("rep endless", "list", rep.List())
 }
-
