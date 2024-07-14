@@ -17,15 +17,15 @@ type gzReader struct {
 	zr *gzip.Reader
 }
 
-func (с *gzReader) Read(p []byte) (n int, err error) {
-	return с.zr.Read(p)
+func (g *gzReader) Read(p []byte) (n int, err error) {
+	return g.zr.Read(p)
 }
 
-func (c *gzReader) Close() error {
-	if err := c.r.Close(); err != nil {
+func (g *gzReader) Close() error {
+	if err := g.r.Close(); err != nil {
 		return err
 	}
-	return c.zr.Close()
+	return g.zr.Close()
 }
 
 func Decompressor(log *slog.Logger) func(http.Handler) http.Handler {
