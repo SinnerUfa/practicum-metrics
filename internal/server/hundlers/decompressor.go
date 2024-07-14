@@ -17,7 +17,7 @@ type gzReader struct {
 	zr *gzip.Reader
 }
 
-func (с gzReader) Read(p []byte) (n int, err error) {
+func (с *gzReader) Read(p []byte) (n int, err error) {
 	return с.zr.Read(p)
 }
 
