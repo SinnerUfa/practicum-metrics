@@ -16,6 +16,7 @@ import (
 func Load(file string, log *slog.Logger, rep repository.Repository) {
 	var out []metrics.Metric
 	b, err := os.ReadFile(file)
+	log.Info("loaded data", "b", b)
 	if err != nil || len(b) == 0 {
 		log.Info("load error", "b", b)
 		return
