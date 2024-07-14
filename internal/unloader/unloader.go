@@ -17,7 +17,7 @@ func Load(file string, log *slog.Logger, rep repository.Repository) {
 	var out []metrics.Metric
 	b, err := os.ReadFile(file)
 	if err != nil || len(b) == 0 {
-		log.Info("load error")
+		log.Info("load error", "b", b)
 		return
 	}
 	err = json.Unmarshal(b, &out)
