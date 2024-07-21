@@ -39,6 +39,7 @@ func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
 	case err := <-errChan:
 		return err
 	case <-ctx.Done():
+		log.Info("Shutdowning")
 		if err := httpServer.Shutdown(ctx); err != nil {
 			log.Warn("", "err", codes.ErrSrvShutdown, "server err:", err)
 			return codes.ErrSrvShutdown

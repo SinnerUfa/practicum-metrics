@@ -10,7 +10,7 @@ type SlaveTicker interface {
 }
 
 func NewAndRun(ctx context.Context, interval uint, s SlaveTicker) {
-	go func(intv uint, slave SlaveTicker) {
+	go func(ctx context.Context, intv uint, slave SlaveTicker) {
 		ticker := time.NewTicker(time.Duration(intv) * time.Second)
 		defer ticker.Stop()
 
@@ -23,5 +23,5 @@ func NewAndRun(ctx context.Context, interval uint, s SlaveTicker) {
 				return
 			}
 		}
-	}(interval, s)
+	}(ctx, interval, s)
 }
