@@ -36,7 +36,7 @@ func New(ctx context.Context, file string, interval uint, log *slog.Logger) (*Un
 	buf, err := os.ReadFile(file)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Info("file storage not found")
+			log.Info("file storage not found (1 из 10 попыток теста")
 		} else {
 			return nil, err
 		}
