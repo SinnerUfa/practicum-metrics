@@ -23,34 +23,36 @@ type Unload struct {
 
 func New(ctx context.Context, file string, interval uint, log *slog.Logger) (*Unload, error) {
 	wd, _ := os.Getwd()
+	wd = filepath.Join(wd, filepath.Dir(file))
 	ex, _ := os.Executable()
-	log.Info("path info", "work dir", wd, "executable", ex, "request file", file)
+	file = filepath.Join(wd, filepath.Base(file))
+	log.Info("path info", "executable", ex, "request file", file)
 
-	if err := os.MkdirAll(filepath.Dir(file), os.ModePerm); err != nil {
+	if err := os.MkdirAll(wd, os.ModePerm); err != nil {
 		return nil, err
 	}
+
 	mem := memory.New()
 	buf, err := os.ReadFile(file)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Info("file not found")
-			return &Unload{Memory: mem}, nil
+			log.Info("file storage not found")
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 	if len(buf) == 0 {
 		log.Info("len == 0")
-		return &Unload{Memory: mem}, nil
+	} else {
+		out := make([]metrics.Metric, 0)
+		if err := json.Unmarshal(buf, &out); err != nil {
+			return nil, err
+		}
+		if err := mem.SetList(out); err != nil {
+			return nil, err
+		}
 	}
 
-	out := make([]metrics.Metric, 0)
-	if err := json.Unmarshal(buf, &out); err != nil {
-		return nil, err
-	}
-
-	if err := mem.SetList(out); err != nil {
-		return nil, err
-	}
 	if interval == 0 {
 		return &Unload{Memory: mem, always: true, file: file, log: log}, nil
 	}
