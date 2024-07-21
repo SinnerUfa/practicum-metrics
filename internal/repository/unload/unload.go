@@ -72,11 +72,12 @@ func (u *Unload) Set(m metrics.Metric) error {
 }
 
 func (u *Unload) Tick() {
+	u.log.Info("Tick start")
 	if err := ship(u.file, u.Memory.List()); err != nil {
 		u.log.Info("Tick error", "err", err)
 		return
 	}
-	u.log.Info("Tick good")
+	u.log.Info("Tick end")
 }
 
 func ship(file string, out []metrics.Metric) error {
