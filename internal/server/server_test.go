@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -109,7 +110,11 @@ func Test_Hundlers(t *testing.T) {
 			},
 		},
 	}
-	rep := repository.New()
+	ctx := context.Background()
+	rep, _ := repository.New(ctx,
+		repository.Config{
+			Restore: false,
+		})
 	log := mlog.New(mlog.SlogType)
 
 	for _, test := range testsGetVoid {
