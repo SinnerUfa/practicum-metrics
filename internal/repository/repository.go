@@ -1,8 +1,14 @@
 package repository
 
 import (
-	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
-	memory "github.com/SinnerUfa/practicum-metric/internal/repository/memory"
+	"context"
+	"log/slog"
+
+	"github.com/SinnerUfa/practicum-metric/internal/repository/memory"
+
+	"github.com/SinnerUfa/practicum-metric/internal/repository/unload"
+
+	"github.com/SinnerUfa/practicum-metric/internal/metrics"
 )
 
 type Repository interface {
@@ -12,6 +18,17 @@ type Repository interface {
 	SetList([]metrics.Metric) error
 }
 
-func New() Repository {
-	return memory.New()
+type Config struct {
+	StoreInterval   uint
+	FileStoragePath string
+	Restore         bool
+	DatabaseDSN     string
+	Log             *slog.Logger
+}
+
+func New(ctx context.Context, cfg Config) (Repository, error) {
+	if cfg.Restore {
+		return unload.New(ctx, cfg.FileStoragePath, cfg.StoreInterval, cfg.Log)
+	}
+	return memory.New(), nil
 }

@@ -9,7 +9,10 @@ import (
 )
 
 func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
-	rep := repository.New()
+	rep, err := repository.New(ctx, repository.Config{Log: log})
+	if err != nil {
+		return err
+	}
 	loader := NewLoader(log, rep)
 	ticker.NewAndRun(ctx, cfg.PollInterval, loader)
 	poster := NewPoster(ctx, log, rep, cfg.Adress)

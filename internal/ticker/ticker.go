@@ -10,16 +10,16 @@ type SlaveTicker interface {
 }
 
 func NewAndRun(ctx context.Context, interval uint, s SlaveTicker) {
-	go func(uint, SlaveTicker) {
-		ticker := time.NewTicker(time.Duration(interval) * time.Second)
+	go func(intv uint, slave SlaveTicker) {
+		ticker := time.NewTicker(time.Duration(intv) * time.Second)
 		defer ticker.Stop()
 
 		for {
 			select {
 			case <-ticker.C:
-				s.Tick()
+				slave.Tick()
 			case <-ctx.Done():
-				s.Tick()
+				slave.Tick()
 				return
 			}
 		}

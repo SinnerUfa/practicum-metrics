@@ -1,8 +1,8 @@
 package memory
 
 import (
-	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
-	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
+	"github.com/SinnerUfa/practicum-metric/internal/codes"
+	"github.com/SinnerUfa/practicum-metric/internal/metrics"
 	cnt "github.com/SinnerUfa/practicum-metric/internal/metrics/counter"
 	gau "github.com/SinnerUfa/practicum-metric/internal/metrics/gauge"
 )

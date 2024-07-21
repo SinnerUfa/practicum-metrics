@@ -5,21 +5,23 @@ import (
 	"log/slog"
 	"net/http"
 
-	unloader "github.com/SinnerUfa/practicum-metric/internal/unloader"
-
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
 func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
-	rep := repository.New()
-	// создание rep с сохранением в файл сделать внутри new
-	if cfg.Restore {
-		unloader.Load(cfg.FileStoragePath, log, rep)
+	rep, err := repository.New(ctx,
+		repository.Config{
+			StoreInterval:   cfg.StoreInterval,
+			FileStoragePath: cfg.FileStoragePath,
+			Restore:         true,
+			DatabaseDSN:     cfg.DatabaseDSN,
+			Log:             log,
+		})
+	if err != nil {
+		log.Warn("repo error", "err", err)
+		return err
 	}
-	rep = unloader.Save(ctx, cfg.FileStoragePath, cfg.StoreInterval, log, rep)
-	// создание rep с сохранением в файл сделать внутри new
-
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
 		Handler: Routes(log, rep),
