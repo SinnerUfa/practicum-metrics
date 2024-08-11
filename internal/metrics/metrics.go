@@ -37,7 +37,10 @@ type MetricJSON struct {
 }
 
 func (m *Metric) UnmarshalJSON(data []byte) (err error) {
-	alias := &MetricJSON{}
+	alias := &MetricJSON{
+		Delta: new(int64),
+		Value: new(float64),
+	}
 	if err = json.Unmarshal(data, alias); err != nil {
 		return
 	}
