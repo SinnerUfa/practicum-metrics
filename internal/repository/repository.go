@@ -61,8 +61,7 @@ func (r *Repository) Close() error {
 	case MemoryStorageType, DBStorageType:
 		return nil
 	case UnloadStorageType:
-		// return r.storage.(*unload.Unload).Close()
-		return nil
+		return r.storage.(*(unload.Unload)).Close()
 	}
 	return nil
 }
