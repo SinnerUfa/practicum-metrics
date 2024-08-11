@@ -1,6 +1,8 @@
 package memory
 
 import (
+	"sync"
+
 	"github.com/SinnerUfa/practicum-metric/internal/codes"
 	"github.com/SinnerUfa/practicum-metric/internal/metrics"
 )
@@ -30,7 +32,7 @@ func (c *Gauge) Value() float64 {
 }
 
 type Memory struct {
-	// sync.RWMutex
+	sync.RWMutex
 	Counters map[string]*Counter
 	Gauges   map[string]*Gauge
 }
@@ -52,23 +54,23 @@ func (mem *Memory) Set(m metrics.Metric) error {
 		if !ok {
 			return codes.ErrRepParseInt
 		}
-		// mem.Lock()
+		mem.Lock()
 		if _, ok := mem.Counters[m.Name]; !ok {
 			mem.Counters[m.Name] = &Counter{}
 		}
 		mem.Counters[m.Name].Set(v)
-		// mem.Unlock()
+		mem.Unlock()
 	case metrics.MetricTypeGauge:
 		v, ok := m.Value.Float64()
 		if !ok {
 			return codes.ErrRepParseFloat
 		}
-		// mem.Lock()
+		mem.Lock()
 		if _, ok := mem.Gauges[m.Name]; !ok {
 			mem.Gauges[m.Name] = &Gauge{}
 		}
 		mem.Gauges[m.Name].Set(v)
-		// mem.Unlock()
+		mem.Unlock()
 	default:
 		return codes.ErrRepMetricNotSupported
 	}
@@ -78,17 +80,17 @@ func (mem *Memory) Set(m metrics.Metric) error {
 func (mem *Memory) Get(m *metrics.Metric) error {
 	switch m.Type {
 	case metrics.MetricTypeCounter:
-		// mem.RLock()
+		mem.RLock()
 		c, ok := mem.Counters[m.Name]
-		// mem.RUnlock()
+		mem.RUnlock()
 		if !ok {
 			return codes.ErrRepNotFound
 		}
 		m.Value = metrics.Int(c.Value())
 	case metrics.MetricTypeGauge:
-		// mem.RLock()
+		mem.RLock()
 		g, ok := mem.Gauges[m.Name]
-		// mem.RUnlock()
+		mem.RUnlock()
 		if !ok {
 			return codes.ErrRepNotFound
 		}
@@ -99,9 +101,9 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 	return nil
 }
 
-func (mem *Memory) List() (out []metrics.Metric) {
-	// mem.RLock()
-	// defer mem.RUnlock()
+func (mem *Memory) GetList() (out []metrics.Metric) {
+	mem.RLock()
+	defer mem.RUnlock()
 	for k, v := range mem.Counters {
 		out = append(out, metrics.Metric{Name: k, Value: metrics.Int(v.Value()), Type: metrics.MetricTypeCounter})
 	}

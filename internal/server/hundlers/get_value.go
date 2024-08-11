@@ -6,11 +6,10 @@ import (
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
-	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 	chi "github.com/go-chi/chi/v5"
 )
 
-func GetValue(rep repository.Repository) http.HandlerFunc {
+func GetValue(getter metrics.Getter) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			name := chi.URLParam(r, "name")
@@ -30,7 +29,7 @@ func GetValue(rep repository.Repository) http.HandlerFunc {
 				return
 			}
 
-			switch rep.Get(metr) {
+			switch getter.Get(metr) {
 			case codes.ErrRepNotFound:
 				http.Error(w, codes.ErrRepNotFound.Error(), http.StatusNotFound)
 				slog.Warn("", "err", codes.ErrRepNotFound)

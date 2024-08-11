@@ -10,11 +10,24 @@ import (
 	"github.com/SinnerUfa/practicum-metric/internal/metrics"
 )
 
-type Repository interface {
-	Set(m metrics.Metric) error
-	Get(m *metrics.Metric) error
-	List() (out []metrics.Metric)
-	SetList([]metrics.Metric) error
+type RepositoryType int
+
+const (
+	MemoryStorageType RepositoryType = iota
+	UnloadStorageType
+	DBStorageType
+)
+
+type Storage interface {
+	metrics.Setter
+	metrics.Getter
+	metrics.ListSetter
+	metrics.ListGetter
+}
+
+type Repository struct {
+	storageType RepositoryType
+	storage     any
 }
 
 type Config struct {
@@ -24,12 +37,21 @@ type Config struct {
 	DatabaseDSN     string
 }
 
-func New(ctx context.Context, cfg Config) (Repository, error) {
+func New(ctx context.Context, cfg Config) (*Repository, error) {
+	r := &Repository{}
 	if cfg.Restore {
-		return unload.New(ctx, cfg.FileStoragePath, cfg.StoreInterval)
+		r.storageType = UnloadStorageType
+		r.storage, _ = unload.New(ctx, cfg.FileStoragePath, cfg.StoreInterval)
 	}
-	return memory.New(), nil
+	r.storageType = MemoryStorageType
+	r.storage = memory.New()
+	return r, nil
 }
 
-func Close() {
+func (r *Repository) Storage() Storage {
+	return r.storage.(Storage)
+}
+
+func (r *Repository) Close() {
+
 }

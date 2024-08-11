@@ -7,16 +7,15 @@ import (
 	"runtime"
 
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
-	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
 type MetricLoad struct {
-	rep     repository.Repository
+	setter  metrics.ListSetter
 	counter uint
 }
 
-func NewLoader(rep repository.Repository) *MetricLoad {
-	return &MetricLoad{rep: rep}
+func NewLoader(setter metrics.ListSetter) *MetricLoad {
+	return &MetricLoad{setter: setter}
 }
 
 func (m *MetricLoad) Load() {
@@ -26,7 +25,7 @@ func (m *MetricLoad) Load() {
 	m.counter++
 	l = append(l, metrics.Metric{Name: "RandomValue", Type: metrics.MetricTypeGauge, Value: metrics.Int(rand.Int())})
 
-	m.rep.SetList(l)
+	m.setter.SetList(l)
 	slog.Debug("load metrics", "increment", m.counter)
 }
 

@@ -8,10 +8,9 @@ import (
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
-	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func PostJSONUpdate(rep repository.Repository) http.HandlerFunc {
+func PostJSONUpdate(setter metrics.Setter) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			if ct := r.Header.Get("Content-Type"); ct != "application/json" {
@@ -34,7 +33,7 @@ func PostJSONUpdate(rep repository.Repository) http.HandlerFunc {
 				return
 			}
 
-			switch err := rep.Set(*metr); err {
+			switch err := setter.Set(*metr); err {
 			case codes.ErrRepParseInt, codes.ErrRepParseFloat, codes.ErrRepMetricNotSupported:
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				slog.Warn("", "err", err)

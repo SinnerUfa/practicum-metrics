@@ -12,9 +12,9 @@ func Run(ctx context.Context, cfg Config) error {
 	if err != nil {
 		return err
 	}
-	loader := NewLoader(rep)
+	loader := NewLoader(rep.Storage())
 	ticker.NewAndRun(ctx, cfg.PollInterval, loader)
-	poster := NewPoster(ctx, rep, cfg.Adress)
+	poster := NewPoster(ctx, rep.Storage(), cfg.Adress)
 	ticker.NewAndRun(ctx, cfg.ReportInterval, poster)
 
 	<-ctx.Done()

@@ -8,7 +8,7 @@ import (
 	chi "github.com/go-chi/chi/v5"
 )
 
-func Routes(rep repository.Repository) http.Handler {
+func Routes(rep repository.Storage) http.Handler {
 	r := chi.NewRouter()
 	// r.Use(hundlers.Decompressor())
 	r.Use(hundlers.Compressor())

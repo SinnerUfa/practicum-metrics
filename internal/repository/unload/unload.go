@@ -65,14 +65,14 @@ func (u *Unload) Set(m metrics.Metric) error {
 		if err := u.Memory.Set(m); err != nil {
 			return err
 		}
-		return ship(u.file, u.Memory.List())
+		return ship(u.file, u.Memory.GetList())
 	}
 	return u.Memory.Set(m)
 }
 
 func (u *Unload) Tick() {
 	slog.Debug("Tick start")
-	if err := ship(u.file, u.Memory.List()); err != nil {
+	if err := ship(u.file, u.Memory.GetList()); err != nil {
 		slog.Warn("Tick error", "err", err)
 		return
 	}

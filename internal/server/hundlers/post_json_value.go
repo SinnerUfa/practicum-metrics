@@ -8,10 +8,9 @@ import (
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
-	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func PostJSONValue(rep repository.Repository) http.HandlerFunc {
+func PostJSONValue(getter metrics.Getter) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			if ct := r.Header.Get("Content-Type"); ct != "application/json" {
@@ -34,7 +33,7 @@ func PostJSONValue(rep repository.Repository) http.HandlerFunc {
 				return
 			}
 
-			switch rep.Get(metr) {
+			switch getter.Get(metr) {
 			case codes.ErrRepNotFound:
 				http.Error(w, codes.ErrRepNotFound.Error(), http.StatusNotFound)
 				slog.Warn("", "err", codes.ErrRepNotFound)

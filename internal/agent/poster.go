@@ -9,18 +9,18 @@ import (
 )
 
 type MetricPost struct {
-	rep     repository.Repository
+	rep     repository.Storage
 	ctx     context.Context
 	adress  string
 	counter uint
 }
 
-func NewPoster(ctx context.Context, rep repository.Repository, adress string) *MetricPost {
+func NewPoster(ctx context.Context, rep repository.Storage, adress string) *MetricPost {
 	return &MetricPost{ctx: ctx, rep: rep, adress: adress}
 }
 
 func (m *MetricPost) Post() {
-	l := m.rep.List()
+	l := m.rep.GetList()
 	client := resty.New()
 
 	endpoint := "http://" + m.adress + "/update/"

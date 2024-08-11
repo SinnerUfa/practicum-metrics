@@ -23,7 +23,7 @@ func Run(ctx context.Context, cfg Config) error {
 	}
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
-		Handler: Routes(rep),
+		Handler: Routes(rep.Storage()),
 	}
 	errChan := make(chan error)
 	go func(ch chan error) {

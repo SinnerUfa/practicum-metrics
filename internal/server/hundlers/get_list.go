@@ -11,7 +11,6 @@ import (
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
-	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
 func ValueString(m *metrics.Value) string {
@@ -44,7 +43,7 @@ var tpi = `<!DOCTYPE html>
   </body>
 </html>`
 
-func GetList(rep repository.Repository) http.HandlerFunc {
+func GetList(getter metrics.ListGetter) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			t := template.New("list")
@@ -59,7 +58,7 @@ func GetList(rep repository.Repository) http.HandlerFunc {
 				slog.Warn("", "err", codes.ErrGetLstParse)
 				return
 			}
-			metrs := rep.List()
+			metrs := getter.GetList()
 			slices.SortFunc(metrs, func(a, b metrics.Metric) int {
 				return cmp.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name))
 			})
