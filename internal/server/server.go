@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
@@ -18,19 +17,20 @@ func Run(ctx context.Context, cfg Config) error {
 			DatabaseDSN:     cfg.DatabaseDSN,
 		})
 	if err != nil {
-		slog.Warn("repo error", "err", err)
+		slog.Warn("repository start with error", "err", err)
 		return err
 	}
+
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
 		Handler: Routes(rep.Storage()),
 	}
 	errChan := make(chan error)
 	go func(ch chan error) {
-		slog.Info("start server on adress", "Addr:", httpServer.Addr)
+		slog.Info("start HTTP server on adress", "Addr:", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Warn("", "err", codes.ErrSrvListen, "server err", err)
-			ch <- codes.ErrSrvListen
+			slog.Warn("HTTP server stop with error", "server err", err)
+			ch <- err
 		}
 	}(errChan)
 
@@ -38,11 +38,14 @@ func Run(ctx context.Context, cfg Config) error {
 	case err := <-errChan:
 		return err
 	case <-ctx.Done():
-		slog.Info("Shutdowning")
+		slog.Info("Shutdowning...")
 		if err := httpServer.Shutdown(ctx); err != nil {
-			slog.Warn("", "err", codes.ErrSrvShutdown, "server err:", err)
-			return codes.ErrSrvShutdown
+			slog.Warn("HTTP server shutdown with error", "server err:", err)
+			return err
 		}
+		slog.Info("HTTP server shutdowned")
+		rep.Close()
+		slog.Info("repository closed")
 	}
 	return nil
 }

@@ -110,17 +110,13 @@ func Test_Hundlers(t *testing.T) {
 			},
 		},
 	}
-	ctx := context.Background()
-	rep, _ := repository.New(ctx,
-		repository.Config{
-			Restore: false,
-		})
-
+	rep, _ := repository.New(context.Background(), repository.Config{Restore: false})
+	store := rep.Storage()
 	for _, test := range testsGetVoid {
 		t.Run("testsGetVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(rep.Storage()).ServeHTTP(w, request)
+			Routes(store).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -132,12 +128,12 @@ func Test_Hundlers(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
-	slog.Debug("rep void ", "list", rep.Storage().GetList())
+	slog.Debug("rep void ", "list", store.GetList())
 	for _, test := range testsPostVoid {
 		t.Run("testsPostVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(rep.Storage()).ServeHTTP(w, request)
+			Routes(store).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -151,7 +147,7 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
-	slog.Debug("rep posted", "list", rep.Storage().GetList())
+	slog.Debug("rep posted", "list", store.GetList())
 	for _, test := range testsGet {
 		t.Run("testsGet", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
@@ -170,5 +166,5 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
-	slog.Debug("rep endless", "list", rep.Storage().GetList())
+	slog.Debug("rep endless", "list", store.GetList())
 }

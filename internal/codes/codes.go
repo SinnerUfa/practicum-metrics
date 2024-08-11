@@ -34,9 +34,6 @@ var (
 	ErrGetLstParse   = errors.New("parse template faild")
 	ErrGetLstReqType = errors.New("bad request string - type")
 	ErrGetLstReqName = errors.New("bad request string - name")
-	// server
-	ErrSrvListen   = errors.New("error listening and serving")
-	ErrSrvShutdown = errors.New("error shutdown")
 	// post json
 	ErrPostNotJSON   = errors.New("bad request - request not JSON")
 	ErrPostBadBody   = errors.New("bad request - bad body")

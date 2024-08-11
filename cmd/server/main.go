@@ -17,17 +17,17 @@ func main() {
 	slog.SetDefault(mlog.New(mlog.ZapType, slog.LevelDebug))
 
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {
-		slog.Error("", "err", err)
+		slog.Error("configuration load fail", "err", err)
 		return
 	}
-	slog.Info("", "cfg", cfg)
+	slog.Info("configuration loaded", "config", cfg)
 
 	ctx := context.Background()
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 
 	if err := run(ctx, cfg); err != nil {
 		cancel()
-		slog.Error("", "err", err)
+		slog.Error("exit with error", "err", err)
 	}
 }
 

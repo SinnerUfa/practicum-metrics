@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/SinnerUfa/practicum-metric/internal/ticker"
 
@@ -15,6 +16,7 @@ import (
 )
 
 type Unload struct {
+	wg sync.WaitGroup
 	*memory.Memory
 	always bool
 	file   string
@@ -23,9 +25,8 @@ type Unload struct {
 func New(ctx context.Context, file string, interval uint) (*Unload, error) {
 	wd, _ := os.Getwd()
 	wd = filepath.Join(wd, filepath.Dir(file))
-	ex, _ := os.Executable()
 	file = filepath.Join(wd, filepath.Base(file))
-	slog.Info("path info", "executable", ex, "request file", file)
+	slog.Info("path info", "request file", file)
 
 	if err := os.MkdirAll(wd, os.ModePerm); err != nil {
 		return nil, err
@@ -71,12 +72,19 @@ func (u *Unload) Set(m metrics.Metric) error {
 }
 
 func (u *Unload) Tick() {
-	slog.Debug("Tick start")
+	u.wg.Add(1)
+	defer u.wg.Done()
+	slog.Debug("unload start")
 	if err := ship(u.file, u.Memory.GetList()); err != nil {
-		slog.Warn("Tick error", "err", err)
+		slog.Warn("unload error", "err", err)
 		return
 	}
-	slog.Debug("Tick end")
+	slog.Debug("unload end")
+}
+
+func (u *Unload) Close() error {
+	u.wg.Wait()
+	return nil
 }
 
 func ship(file string, out []metrics.Metric) error {
