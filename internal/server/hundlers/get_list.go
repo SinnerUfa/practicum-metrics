@@ -44,7 +44,7 @@ var tpi = `<!DOCTYPE html>
   </body>
 </html>`
 
-func GetList(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
+func GetList(rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			t := template.New("list")
@@ -56,7 +56,7 @@ func GetList(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 			// t, err := t.ParseFiles("body_list.html", "index.html") // NOT WORK WITH FUNCS???
 			if err != nil {
 				http.Error(w, codes.ErrRepNotFound.Error(), http.StatusInternalServerError)
-				log.Warn("", "err", codes.ErrGetLstParse)
+				slog.Warn("", "err", codes.ErrGetLstParse)
 				return
 			}
 			metrs := rep.List()

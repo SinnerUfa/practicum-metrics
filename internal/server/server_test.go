@@ -3,12 +3,12 @@ package server
 import (
 	"context"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
-	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -115,13 +115,12 @@ func Test_Hundlers(t *testing.T) {
 		repository.Config{
 			Restore: false,
 		})
-	log := mlog.New(mlog.SlogType)
 
 	for _, test := range testsGetVoid {
 		t.Run("testsGetVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(log, rep).ServeHTTP(w, request)
+			Routes(rep).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -133,12 +132,12 @@ func Test_Hundlers(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
-	log.Info("rep void ", "list", rep.List())
+	slog.Debug("rep void ", "list", rep.List())
 	for _, test := range testsPostVoid {
 		t.Run("testsPostVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(log, rep).ServeHTTP(w, request)
+			Routes(rep).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -152,12 +151,12 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
-	log.Info("rep posted", "list", rep.List())
+	slog.Debug("rep posted", "list", rep.List())
 	for _, test := range testsGet {
 		t.Run("testsGet", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(log, rep).ServeHTTP(w, request)
+			Routes(rep).ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -171,5 +170,5 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
-	log.Info("rep endless", "list", rep.List())
+	slog.Debug("rep endless", "list", rep.List())
 }

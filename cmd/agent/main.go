@@ -15,25 +15,25 @@ import (
 var cfg = agent.DefaultConfig
 
 func main() {
+	slog.SetDefault(mlog.New(mlog.ZapType, slog.LevelDebug))
 
-	log := mlog.New(mlog.SlogType)
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {
-		log.Error("", "err", err)
+		slog.Error("", "err", err)
 		return
 	}
-	log.Info("", "cfg", cfg)
+	slog.Info("", "cfg", cfg)
 
 	ctx := context.Background()
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 
-	if err := run(ctx, log, cfg); err != nil {
+	if err := run(ctx, cfg); err != nil {
 		cancel()
-		log.Error("", "err", err)
+		slog.Error("", "err", err)
 	}
 }
 
-func run(ctx context.Context, log *slog.Logger, cfg agent.Config) error {
-	if err := agent.Run(ctx, log, cfg); err != nil {
+func run(ctx context.Context, cfg agent.Config) error {
+	if err := agent.Run(ctx, cfg); err != nil {
 		return err
 	}
 	return nil

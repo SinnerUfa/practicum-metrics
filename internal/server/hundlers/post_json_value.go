@@ -11,12 +11,12 @@ import (
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func PostJSONValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
+func PostJSONValue(rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			if ct := r.Header.Get("Content-Type"); ct != "application/json" {
 				http.Error(w, codes.ErrPostNotJSON.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostNotJSON)
+				slog.Warn("", "err", codes.ErrPostNotJSON)
 				return
 			}
 
@@ -24,31 +24,31 @@ func PostJSONValue(log *slog.Logger, rep repository.Repository) http.HandlerFunc
 			_, err := buf.ReadFrom(r.Body)
 			if err != nil {
 				http.Error(w, codes.ErrPostBadBody.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostBadBody)
+				slog.Warn("", "err", codes.ErrPostBadBody)
 				return
 			}
 			metr := &metrics.Metric{}
 			if err = json.Unmarshal(buf.Bytes(), metr); err != nil {
 				http.Error(w, codes.ErrPostUnmarshal.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostUnmarshal)
+				slog.Warn("", "err", codes.ErrPostUnmarshal)
 				return
 			}
 
 			switch rep.Get(metr) {
 			case codes.ErrRepNotFound:
 				http.Error(w, codes.ErrRepNotFound.Error(), http.StatusNotFound)
-				log.Warn("", "err", codes.ErrRepNotFound)
+				slog.Warn("", "err", codes.ErrRepNotFound)
 				return
 			case codes.ErrRepMetricNotSupported:
 				http.Error(w, codes.ErrRepMetricNotSupported.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrRepMetricNotSupported)
+				slog.Warn("", "err", codes.ErrRepMetricNotSupported)
 				return
 			}
 
 			resp, err := json.Marshal(metr)
 			if err != nil {
 				http.Error(w, codes.ErrPostMarshal.Error(), http.StatusInternalServerError)
-				log.Warn("", "err", codes.ErrPostMarshal)
+				slog.Warn("", "err", codes.ErrPostMarshal)
 				return
 			}
 

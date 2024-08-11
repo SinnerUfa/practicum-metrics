@@ -9,39 +9,38 @@ import (
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func Run(ctx context.Context, log *slog.Logger, cfg Config) error {
+func Run(ctx context.Context, cfg Config) error {
 	rep, err := repository.New(ctx,
 		repository.Config{
 			StoreInterval:   cfg.StoreInterval,
 			FileStoragePath: cfg.FileStoragePath,
 			Restore:         true,
 			DatabaseDSN:     cfg.DatabaseDSN,
-			Log:             log,
 		})
 	if err != nil {
-		log.Warn("repo error", "err", err)
+		slog.Warn("repo error", "err", err)
 		return err
 	}
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,
-		Handler: Routes(log, rep),
+		Handler: Routes(rep),
 	}
 	errChan := make(chan error)
-	go func(log *slog.Logger, ch chan error) {
-		log.Info("start server on adress", "Addr:", httpServer.Addr)
+	go func(ch chan error) {
+		slog.Info("start server on adress", "Addr:", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Warn("", "err", codes.ErrSrvListen, "server err", err)
+			slog.Warn("", "err", codes.ErrSrvListen, "server err", err)
 			ch <- codes.ErrSrvListen
 		}
-	}(log, errChan)
+	}(errChan)
 
 	select {
 	case err := <-errChan:
 		return err
 	case <-ctx.Done():
-		log.Info("Shutdowning")
+		slog.Info("Shutdowning")
 		if err := httpServer.Shutdown(ctx); err != nil {
-			log.Warn("", "err", codes.ErrSrvShutdown, "server err:", err)
+			slog.Warn("", "err", codes.ErrSrvShutdown, "server err:", err)
 			return codes.ErrSrvShutdown
 		}
 	}

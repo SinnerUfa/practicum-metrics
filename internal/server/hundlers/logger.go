@@ -29,7 +29,7 @@ func (w *logWriter) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
-func Logger(log *slog.Logger) func(http.Handler) http.Handler {
+func Logger() func(http.Handler) http.Handler {
 	mid := func(h http.Handler) http.Handler {
 		hundler := func(w http.ResponseWriter, r *http.Request) {
 			lw := &logWriter{
@@ -46,7 +46,7 @@ func Logger(log *slog.Logger) func(http.Handler) http.Handler {
 			}
 
 			h.ServeHTTP(lw, r)
-			log.Info("",
+			slog.Info("",
 				slog.Group("request",
 					slog.String("method", r.Method),
 					slog.String("url", r.RequestURI),

@@ -11,12 +11,12 @@ import (
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 )
 
-func PostJSONUpdate(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
+func PostJSONUpdate(rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			if ct := r.Header.Get("Content-Type"); ct != "application/json" {
 				http.Error(w, codes.ErrPostNotJSON.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostNotJSON)
+				slog.Warn("", "err", codes.ErrPostNotJSON)
 				return
 			}
 
@@ -24,27 +24,27 @@ func PostJSONUpdate(log *slog.Logger, rep repository.Repository) http.HandlerFun
 			_, err := buf.ReadFrom(r.Body)
 			if err != nil {
 				http.Error(w, codes.ErrPostBadBody.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostBadBody)
+				slog.Warn("", "err", codes.ErrPostBadBody)
 				return
 			}
 			metr := &metrics.Metric{}
 			if err = json.Unmarshal(buf.Bytes(), metr); err != nil {
 				http.Error(w, codes.ErrPostUnmarshal.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostUnmarshal)
+				slog.Warn("", "err", codes.ErrPostUnmarshal)
 				return
 			}
 
 			switch err := rep.Set(*metr); err {
 			case codes.ErrRepParseInt, codes.ErrRepParseFloat, codes.ErrRepMetricNotSupported:
 				http.Error(w, err.Error(), http.StatusBadRequest)
-				log.Warn("", "err", err)
+				slog.Warn("", "err", err)
 				return
 			}
 
 			resp, err := json.Marshal(metr)
 			if err != nil {
 				http.Error(w, codes.ErrPostMarshal.Error(), http.StatusInternalServerError)
-				log.Warn("", "err", codes.ErrPostMarshal)
+				slog.Warn("", "err", codes.ErrPostMarshal)
 				return
 			}
 

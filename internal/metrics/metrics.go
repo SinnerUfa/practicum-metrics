@@ -3,8 +3,6 @@ package metrics
 import (
 	"encoding/json"
 	"fmt"
-
-	jmetric "github.com/SinnerUfa/practicum-metric/internal/api/jmetric"
 )
 
 type MetricType string
@@ -31,15 +29,15 @@ func (m Metric) ReguestString(head string) string {
 	}
 }
 
+type MetricJSON struct {
+	ID    string   `json:"id"`
+	MType string   `json:"type"`
+	Delta *int64   `json:"delta,omitempty"`
+	Value *float64 `json:"value,omitempty"`
+}
+
 func (m *Metric) UnmarshalJSON(data []byte) (err error) {
-	jm := jmetric.New()
-	alias := &struct {
-		*jmetric.Metrics
-		Delta int64   `json:"delta,omitempty"`
-		Value float64 `json:"value,omitempty"`
-	}{
-		Metrics: jm,
-	}
+	alias := &MetricJSON{}
 	if err = json.Unmarshal(data, alias); err != nil {
 		return
 	}
@@ -47,9 +45,9 @@ func (m *Metric) UnmarshalJSON(data []byte) (err error) {
 	m.Type = MetricType(alias.MType)
 	switch m.Type {
 	case MetricTypeGauge:
-		m.Value = Float(alias.Value)
+		m.Value = Float(*alias.Value)
 	case MetricTypeCounter:
-		m.Value = Int(alias.Delta)
+		m.Value = Int(*alias.Delta)
 	default:
 		m.Value = Int(0)
 	}
@@ -57,19 +55,22 @@ func (m *Metric) UnmarshalJSON(data []byte) (err error) {
 }
 
 func (m Metric) MarshalJSON() (data []byte, err error) {
-	jm := jmetric.New()
-	jm.ID = m.Name
-	jm.MType = string(m.Type)
+	alias := &MetricJSON{
+		ID:    m.Name,
+		MType: string(m.Type),
+		Delta: new(int64),
+		Value: new(float64),
+	}
 	switch m.Type {
 	case MetricTypeGauge:
-		*(jm.Value), _ = m.Value.Float64()
-		jm.Delta = nil
+		*alias.Value, _ = m.Value.Float64()
+		alias.Delta = nil
 	case MetricTypeCounter:
-		*(jm.Delta), _ = m.Value.Int64()
-		jm.Value = nil
+		*alias.Delta, _ = m.Value.Int64()
+		alias.Value = nil
 	default:
-		jm.Value = nil
-		jm.Delta = nil
+		alias.Value = nil
+		alias.Delta = nil
 	}
-	return json.Marshal(*jm)
+	return json.Marshal(&alias)
 }

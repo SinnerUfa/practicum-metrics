@@ -10,7 +10,7 @@ import (
 	chi "github.com/go-chi/chi/v5"
 )
 
-func PostUpdate(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
+func PostUpdate(rep repository.Repository) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			name := chi.URLParam(r, "name")
@@ -23,23 +23,23 @@ func PostUpdate(log *slog.Logger, rep repository.Repository) http.HandlerFunc {
 			}
 			if name == "" {
 				http.Error(w, codes.ErrPostValReqName.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostValReqName)
+				slog.Warn("", "err", codes.ErrPostValReqName)
 				return
 			}
 			if typ == "" {
 				http.Error(w, codes.ErrPostValReqType.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrPostValReqType)
+				slog.Warn("", "err", codes.ErrPostValReqType)
 				return
 			}
 			if value == "" {
 				http.Error(w, codes.ErrPostValReqValue.Error(), http.StatusBadRequest)
-				log.Warn("", "err", codes.ErrGetValReqType)
+				slog.Warn("", "err", codes.ErrGetValReqType)
 				return
 			}
 			switch err := rep.Set(*metr); err {
 			case codes.ErrRepParseInt, codes.ErrRepParseFloat, codes.ErrRepMetricNotSupported:
 				http.Error(w, err.Error(), http.StatusBadRequest)
-				log.Warn("", "err", err)
+				slog.Warn("", "err", err)
 				return
 			}
 

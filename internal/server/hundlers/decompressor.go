@@ -28,7 +28,7 @@ func (g *gzReader) Close() error {
 	return g.zr.Close()
 }
 
-func Decompressor(log *slog.Logger) func(http.Handler) http.Handler {
+func Decompressor() func(http.Handler) http.Handler {
 	var buf bytes.Buffer
 
 	gzw, _ := gzip.NewWriterLevel(&buf, gzip.BestCompression)
@@ -41,7 +41,7 @@ func Decompressor(log *slog.Logger) func(http.Handler) http.Handler {
 				strings.Contains(r.Header.Get("Content-Encoding"), "gzip") {
 				if err != nil {
 					http.Error(w, codes.ErrDecompressor.Error(), http.StatusInternalServerError)
-					log.Warn("", "err", codes.ErrDecompressor, "gz_err", err)
+					slog.Warn("", "err", codes.ErrDecompressor, "gz_err", err)
 				}
 				gz.Reset(r.Body)
 				rr := &gzReader{

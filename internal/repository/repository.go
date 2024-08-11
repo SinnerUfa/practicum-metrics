@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/SinnerUfa/practicum-metric/internal/repository/memory"
 
@@ -23,12 +22,14 @@ type Config struct {
 	FileStoragePath string
 	Restore         bool
 	DatabaseDSN     string
-	Log             *slog.Logger
 }
 
 func New(ctx context.Context, cfg Config) (Repository, error) {
 	if cfg.Restore {
-		return unload.New(ctx, cfg.FileStoragePath, cfg.StoreInterval, cfg.Log)
+		return unload.New(ctx, cfg.FileStoragePath, cfg.StoreInterval)
 	}
 	return memory.New(), nil
+}
+
+func Close() {
 }

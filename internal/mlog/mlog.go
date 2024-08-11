@@ -1,5 +1,4 @@
 // mlog - package for connecting loggers via interface slog
-// TODO: implement or find a more informative handler
 package mlog
 
 import (
@@ -31,7 +30,7 @@ const (
 	ZapType
 )
 
-func New(l LoggerType) *slog.Logger {
+func New(l LoggerType, lv slog.Level) *slog.Logger {
 	once.Do(func() {
 		o := []io.Writer{os.Stdout}
 		f, err := os.OpenFile(outFileName, os.O_CREATE|os.O_WRONLY, os.ModePerm)
@@ -41,20 +40,19 @@ func New(l LoggerType) *slog.Logger {
 		var handler slog.Handler
 		switch l {
 		case SlogType:
-			handler = slogHandler(io.MultiWriter(o...))
+			handler = slogHandler(io.MultiWriter(o...), lv)
 		case ZapType:
-			handler = zapHandler(io.MultiWriter(o...))
+			handler = zapHandler(io.MultiWriter(o...), lv)
 		default:
-			handler = slogHandler(io.MultiWriter(o...))
+			handler = slogHandler(io.MultiWriter(o...), lv)
 		}
-
 		instance = slog.New(handler)
 	})
 
 	return instance
 }
 
-func slogHandler(w io.Writer) *slog.JSONHandler {
+func slogHandler(w io.Writer, lv slog.Level) *slog.JSONHandler {
 	replace := func(groups []string, a slog.Attr) slog.Attr {
 		switch a.Key {
 		case slog.MessageKey:
@@ -82,18 +80,32 @@ func slogHandler(w io.Writer) *slog.JSONHandler {
 	options := &slog.HandlerOptions{
 		AddSource:   true,
 		ReplaceAttr: replace,
+		Level:       lv,
 	}
 	return slog.NewJSONHandler(w, options)
 }
 
-func zapHandler(w io.Writer) *zapslog.Handler {
+func zapHandler(w io.Writer, lv slog.Level) *zapslog.Handler {
 	encoder := zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig()) // need fine encoder tuning
 
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= zapcore.DebugLevel
+		return lvl >= zapConvertSlogLevel(lv)
 	})
 
 	core := zapcore.NewCore(encoder, zapcore.AddSync(w), highPriority)
 
 	return zapslog.NewHandler(core, &zapslog.HandlerOptions{AddSource: true})
+}
+
+func zapConvertSlogLevel(l slog.Level) zapcore.Level {
+	switch {
+	case l >= slog.LevelError:
+		return zapcore.ErrorLevel
+	case l >= slog.LevelWarn:
+		return zapcore.WarnLevel
+	case l >= slog.LevelInfo:
+		return zapcore.InfoLevel
+	default:
+		return zapcore.DebugLevel
+	}
 }

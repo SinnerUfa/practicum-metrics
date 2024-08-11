@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log/slog"
+	slog "log/slog"
 	"os"
 	"os/signal"
 
@@ -14,25 +14,25 @@ import (
 var cfg server.Config = server.DefaultConfig
 
 func main() {
-	log := mlog.New(mlog.ZapType)
+	slog.SetDefault(mlog.New(mlog.ZapType, slog.LevelDebug))
 
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {
-		log.Error("", "err", err)
+		slog.Error("", "err", err)
 		return
 	}
-	log.Info("", "cfg", cfg)
+	slog.Info("", "cfg", cfg)
 
 	ctx := context.Background()
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 
-	if err := run(ctx, log, cfg); err != nil {
+	if err := run(ctx, cfg); err != nil {
 		cancel()
-		log.Error("", "err", err)
+		slog.Error("", "err", err)
 	}
 }
 
-func run(ctx context.Context, log *slog.Logger, cfg server.Config) error {
-	if err := server.Run(ctx, log, cfg); err != nil {
+func run(ctx context.Context, cfg server.Config) error {
+	if err := server.Run(ctx, cfg); err != nil {
 		return err
 	}
 	return nil

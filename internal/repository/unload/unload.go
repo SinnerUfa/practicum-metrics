@@ -18,15 +18,14 @@ type Unload struct {
 	*memory.Memory
 	always bool
 	file   string
-	log    *slog.Logger
 }
 
-func New(ctx context.Context, file string, interval uint, log *slog.Logger) (*Unload, error) {
+func New(ctx context.Context, file string, interval uint) (*Unload, error) {
 	wd, _ := os.Getwd()
 	wd = filepath.Join(wd, filepath.Dir(file))
 	ex, _ := os.Executable()
 	file = filepath.Join(wd, filepath.Base(file))
-	log.Info("path info", "executable", ex, "request file", file)
+	slog.Info("path info", "executable", ex, "request file", file)
 
 	if err := os.MkdirAll(wd, os.ModePerm); err != nil {
 		return nil, err
@@ -36,13 +35,13 @@ func New(ctx context.Context, file string, interval uint, log *slog.Logger) (*Un
 	buf, err := os.ReadFile(file)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Info("file storage not found (3 из 10 попыток теста")
+			slog.Warn("file storage not found (3 из 10 попыток теста")
 		} else {
 			return nil, err
 		}
 	}
 	if len(buf) == 0 {
-		log.Info("len == 0")
+		slog.Warn("len == 0")
 	} else {
 		out := make([]metrics.Metric, 0)
 		if err := json.Unmarshal(buf, &out); err != nil {
@@ -54,9 +53,9 @@ func New(ctx context.Context, file string, interval uint, log *slog.Logger) (*Un
 	}
 
 	if interval == 0 {
-		return &Unload{Memory: mem, always: true, file: file, log: log}, nil
+		return &Unload{Memory: mem, always: true, file: file}, nil
 	}
-	u := &Unload{Memory: mem, always: true, file: file, log: log}
+	u := &Unload{Memory: mem, always: true, file: file}
 	ticker.NewAndRun(ctx, interval, u)
 	return u, nil
 }
@@ -72,12 +71,12 @@ func (u *Unload) Set(m metrics.Metric) error {
 }
 
 func (u *Unload) Tick() {
-	u.log.Info("Tick start")
+	slog.Debug("Tick start")
 	if err := ship(u.file, u.Memory.List()); err != nil {
-		u.log.Info("Tick error", "err", err)
+		slog.Warn("Tick error", "err", err)
 		return
 	}
-	u.log.Info("Tick end")
+	slog.Debug("Tick end")
 }
 
 func ship(file string, out []metrics.Metric) error {
