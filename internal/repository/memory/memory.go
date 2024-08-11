@@ -3,20 +3,42 @@ package memory
 import (
 	"github.com/SinnerUfa/practicum-metric/internal/codes"
 	"github.com/SinnerUfa/practicum-metric/internal/metrics"
-	cnt "github.com/SinnerUfa/practicum-metric/internal/metrics/counter"
-	gau "github.com/SinnerUfa/practicum-metric/internal/metrics/gauge"
 )
+
+type Counter struct {
+	value int64
+}
+
+func (c *Counter) Set(i int64) {
+	c.value += i
+}
+
+func (c *Counter) Value() int64 {
+	return c.value
+}
+
+type Gauge struct {
+	value float64
+}
+
+func (c *Gauge) Set(i float64) {
+	c.value = i
+}
+
+func (c *Gauge) Value() float64 {
+	return c.value
+}
 
 type Memory struct {
 	// sync.RWMutex
-	Counters map[string]*cnt.Counter
-	Gauges   map[string]*gau.Gauge
+	Counters map[string]*Counter
+	Gauges   map[string]*Gauge
 }
 
 func New() *Memory {
 	return &Memory{
-		Counters: make(map[string]*cnt.Counter),
-		Gauges:   make(map[string]*gau.Gauge),
+		Counters: make(map[string]*Counter),
+		Gauges:   make(map[string]*Gauge),
 	}
 }
 
@@ -32,7 +54,7 @@ func (mem *Memory) Set(m metrics.Metric) error {
 		}
 		// mem.Lock()
 		if _, ok := mem.Counters[m.Name]; !ok {
-			mem.Counters[m.Name] = &cnt.Counter{}
+			mem.Counters[m.Name] = &Counter{}
 		}
 		mem.Counters[m.Name].Set(v)
 		// mem.Unlock()
@@ -43,7 +65,7 @@ func (mem *Memory) Set(m metrics.Metric) error {
 		}
 		// mem.Lock()
 		if _, ok := mem.Gauges[m.Name]; !ok {
-			mem.Gauges[m.Name] = &gau.Gauge{}
+			mem.Gauges[m.Name] = &Gauge{}
 		}
 		mem.Gauges[m.Name].Set(v)
 		// mem.Unlock()
