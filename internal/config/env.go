@@ -1,4 +1,4 @@
-package env
+package config
 
 import (
 	"os"
@@ -9,7 +9,7 @@ import (
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 )
 
-func Load(v any) error {
+func LoadEnv(v any) error {
 	structValuePtr := reflect.ValueOf(v)
 	structTypePtr := reflect.TypeOf(v)
 

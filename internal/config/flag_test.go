@@ -1,14 +1,13 @@
-package env
+package config
 
 import (
-	"os"
 	"testing"
 
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Load(t *testing.T) {
+func Test_LoadFlags(t *testing.T) {
 
 	t.Run("TypeInTest", func(t *testing.T) {
 		type test struct {
@@ -26,36 +25,36 @@ func Test_Load(t *testing.T) {
 		tests := []test{
 			{
 				a,
-				codes.ErrEnvNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				b,
-				codes.ErrEnvNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				c,
-				codes.ErrEnvNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				d,
-				codes.ErrEnvNoAcsess,
+				codes.ErrFlgNoAcsess,
 			},
 			{
 				&a,
-				codes.ErrEnvNotStructure,
+				codes.ErrFlgNotStructure,
 			},
 			{
 				&b,
-				codes.ErrEnvNotStructure,
+				codes.ErrFlgNotStructure,
 			},
 			{
 				&c,
-				codes.ErrEnvNotStructure,
+				codes.ErrFlgNotStructure,
 			},
 		}
 
 		for _, test := range tests {
-			err := Load(test.in)
+			err := LoadFlags(test.in, []string{})
 			if assert.Error(t, err) {
 				assert.Equal(t, test.want, err)
 			}
@@ -67,34 +66,34 @@ func Test_Load(t *testing.T) {
 			want error
 		}
 		type tmp0 struct {
-			in int `env:"IN"`
+			in int `flag:"in"`
 		}
 		type tmp1 struct {
-			in float32 `env:"IN"`
+			in float32 `flag:"in"`
 		}
 		type tmp2 struct {
-			In float32 `env:"IN"`
+			In float32 `flag:"in"`
 		}
 		a := tmp0{20}
 		b := tmp1{20}
 		c := tmp2{20}
-		os.Setenv("IN", "0")
+
 		tests := []test{
 			{
 				&a,
-				codes.ErrEnvFieldNotSet,
+				codes.ErrFlgFieldNotSet,
 			},
 			{
 				&b,
-				codes.ErrEnvFieldNotSet,
+				codes.ErrFlgFieldNotSupported,
 			},
 			{
 				&c,
-				codes.ErrEnvFieldNotSupported,
+				codes.ErrFlgFieldNotSupported,
 			},
 		}
 		for _, test := range tests {
-			err := Load(test.in)
+			err := LoadFlags(test.in, []string{})
 			if assert.Error(t, err) {
 				assert.Equal(t, test.want, err)
 			}
@@ -102,32 +101,30 @@ func Test_Load(t *testing.T) {
 	})
 
 	t.Run("TypeLoadTest", func(t *testing.T) {
-		type testArg struct {
-			name  string
-			value string
-		}
 		type testValue struct {
-			A uint   `env:"A"`
-			B int    `env:"B"`
-			C string `env:"C"`
-			D uint   `env:""`
-			E uint   `env:"-"`
+			A uint   `flag:"A"`
+			B int    `flag:"B"`
+			G bool   `flag:"G"`
+			C string `flag:"C"`
+			D uint   `flag:""`
+			E uint   `flag:"-"`
 			F uint
-			G bool `env:"G"`
+			J bool `flag:"J"`
+			K bool `flag:"K"`
 		}
 
 		type test struct {
-			args []testArg
+			args []string
 			want testValue
 		}
 
 		tests := []test{
 			{
-				[]testArg{
-					{"A", "11"}, {"B", "21"}, {"C", "31"}, {"D", "41"}, {"E", "51"}, {"F", "61"}, {"G", "true"},
+				[]string{
+					"-A", "11", "-B", "21", "-C", "31", "-G", "false", "-J", "true", "-K", "",
 				},
 				testValue{
-					11, 21, "31", 4, 5, 6, true,
+					A: 11, B: 21, C: "31", D: 4, E: 5, F: 6, G: false, J: true, K: false,
 				},
 			},
 		}
@@ -139,13 +136,12 @@ func Test_Load(t *testing.T) {
 				D: 4,
 				E: 5,
 				F: 6,
-				G: false,
+				G: true,
+				J: false,
+				K: true,
 			}
 
-			for _, a := range test.args {
-				os.Setenv(a.name, a.value)
-			}
-			err := Load(&in)
+			err := LoadFlags(&in, test.args)
 			if assert.NoError(t, err) {
 				assert.Equal(t, in, test.want)
 			}

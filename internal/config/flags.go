@@ -1,4 +1,4 @@
-package flags
+package config
 
 import (
 	"flag"
@@ -8,7 +8,7 @@ import (
 	codes "github.com/SinnerUfa/practicum-metric/internal/codes"
 )
 
-func Load(v any, args []string) error {
+func LoadFlags(v any, args []string) error {
 	structValuePtr := reflect.ValueOf(v)
 	structTypePtr := reflect.TypeOf(v)
 
