@@ -21,6 +21,7 @@ func Run(ctx context.Context, cfg Config) error {
 		return err
 	}
 	slog.Info("repository open")
+	slog.Info("repository storge type", "type", rep.Type())
 
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,

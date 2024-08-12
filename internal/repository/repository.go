@@ -3,11 +3,10 @@ package repository
 import (
 	"context"
 
-	"github.com/SinnerUfa/practicum-metric/internal/repository/memory"
-
-	"github.com/SinnerUfa/practicum-metric/internal/repository/unload"
-
 	"github.com/SinnerUfa/practicum-metric/internal/metrics"
+	"github.com/SinnerUfa/practicum-metric/internal/repository/database"
+	"github.com/SinnerUfa/practicum-metric/internal/repository/memory"
+	"github.com/SinnerUfa/practicum-metric/internal/repository/unload"
 )
 
 type RepositoryType int
@@ -39,6 +38,15 @@ type Config struct {
 
 func New(ctx context.Context, cfg Config) (*Repository, error) {
 	r := &Repository{}
+	if cfg.DatabaseDSN != "" {
+		r.storageType = DBStorageType
+		storage, err := database.New(ctx, cfg.DatabaseDSN)
+		if err != nil {
+			return nil, err
+		}
+		r.storage = storage
+		return r, nil
+	}
 	if cfg.Restore {
 		r.storageType = UnloadStorageType
 		storage, err := unload.New(ctx, cfg.FileStoragePath, cfg.StoreInterval)
@@ -59,10 +67,24 @@ func (r *Repository) Storage() Storage {
 
 func (r *Repository) Close() error {
 	switch r.storageType {
-	case MemoryStorageType, DBStorageType:
+	case MemoryStorageType:
 		return nil
+	case DBStorageType:
+		return r.storage.(*(database.Database)).Close()
 	case UnloadStorageType:
 		return r.storage.(*(unload.Unload)).Close()
 	}
 	return nil
+}
+
+func (r *Repository) Type() string {
+	switch r.storageType {
+	case MemoryStorageType:
+		return "memory storage"
+	case DBStorageType:
+		return "DB storage"
+	case UnloadStorageType:
+		return "file storage"
+	}
+	return "unknown storage"
 }

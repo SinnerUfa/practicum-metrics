@@ -15,6 +15,7 @@ func Run(ctx context.Context, cfg Config) error {
 		return err
 	}
 	slog.Info("repository open")
+	slog.Info("repository storge type", "type", rep.Type())
 
 	loader := ticker.NewAndRun(ctx, cfg.PollInterval, NewLoader(rep.Storage()))
 	poster := ticker.NewAndRun(ctx, cfg.ReportInterval, NewPoster(ctx, rep.Storage(), cfg.Adress))

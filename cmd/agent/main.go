@@ -8,7 +8,6 @@ import (
 
 	agent "github.com/SinnerUfa/practicum-metric/internal/agent"
 	config "github.com/SinnerUfa/practicum-metric/internal/config"
-
 	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 )
 
