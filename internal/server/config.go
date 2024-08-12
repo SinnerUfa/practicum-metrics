@@ -10,7 +10,7 @@ type Config struct {
 
 var DefaultConfig = Config{
 	Adress:          "localhost:8080",
-	StoreInterval:   2,
+	StoreInterval:   300,
 	FileStoragePath: "/tmp/metrics-db.json",
 	Restore:         true,
 	DatabaseDSN:     "",

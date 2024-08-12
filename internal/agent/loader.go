@@ -20,12 +20,11 @@ func NewLoader(setter metrics.ListSetter) *MetricLoad {
 
 func (m *MetricLoad) Load() {
 	l := GetRuntimeMetrics()
-
 	l = append(l, metrics.Metric{Name: "PollCount", Type: metrics.MetricTypeCounter, Value: metrics.Uint(m.counter)})
-	m.counter++
 	l = append(l, metrics.Metric{Name: "RandomValue", Type: metrics.MetricTypeGauge, Value: metrics.Int(rand.Int())})
 
 	m.setter.SetList(l)
+	m.counter++
 	slog.Debug("load metrics", "increment", m.counter)
 }
 

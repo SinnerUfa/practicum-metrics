@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/SinnerUfa/practicum-metric/internal/ticker"
 
@@ -16,17 +15,16 @@ import (
 )
 
 type Unload struct {
-	wg sync.WaitGroup
 	*memory.Memory
 	always bool
 	file   string
+	ticker *ticker.Ticker
 }
 
 func New(ctx context.Context, file string, interval uint) (*Unload, error) {
 	wd, _ := os.Getwd()
 	wd = filepath.Join(wd, filepath.Dir(file))
 	file = filepath.Join(wd, filepath.Base(file))
-	slog.Info("path info", "request file", file)
 
 	if err := os.MkdirAll(wd, os.ModePerm); err != nil {
 		return nil, err
@@ -34,16 +32,11 @@ func New(ctx context.Context, file string, interval uint) (*Unload, error) {
 
 	mem := memory.New()
 	buf, err := os.ReadFile(file)
-	if err != nil {
-		if os.IsNotExist(err) {
-			slog.Warn("file storage not found (3 из 10 попыток теста")
-		} else {
-			return nil, err
-		}
+	if err != nil && !os.IsNotExist(err) {
+		return nil, err
 	}
-	if len(buf) == 0 {
-		slog.Warn("len == 0")
-	} else {
+
+	if len(buf) != 0 {
 		out := make([]metrics.Metric, 0)
 		if err := json.Unmarshal(buf, &out); err != nil {
 			return nil, err
@@ -54,10 +47,10 @@ func New(ctx context.Context, file string, interval uint) (*Unload, error) {
 	}
 
 	if interval == 0 {
-		return &Unload{Memory: mem, always: true, file: file}, nil
+		return &Unload{Memory: mem, always: true, file: file, ticker: nil}, nil
 	}
-	u := &Unload{Memory: mem, always: true, file: file}
-	ticker.NewAndRun(ctx, interval, u)
+	u := &Unload{Memory: mem, always: false, file: file}
+	u.ticker = ticker.NewAndRun(ctx, interval, u)
 	return u, nil
 }
 
@@ -66,28 +59,26 @@ func (u *Unload) Set(m metrics.Metric) error {
 		if err := u.Memory.Set(m); err != nil {
 			return err
 		}
-		return ship(u.file, u.Memory.GetList())
+		return unload(u.file, u.Memory.GetList())
 	}
 	return u.Memory.Set(m)
 }
 
 func (u *Unload) Tick() {
-	u.wg.Add(1)
-	defer u.wg.Done()
-	slog.Debug("unload start")
-	if err := ship(u.file, u.Memory.GetList()); err != nil {
-		slog.Warn("unload error", "err", err)
+	slog.Debug("repository unload start")
+	if err := unload(u.file, u.Memory.GetList()); err != nil {
+		slog.Warn("repository unload error", "err", err)
 		return
 	}
-	slog.Debug("unload end")
+	slog.Debug("repository unload end")
 }
 
 func (u *Unload) Close() error {
-	u.wg.Wait()
+	u.ticker.Close()
 	return nil
 }
 
-func ship(file string, out []metrics.Metric) error {
+func unload(file string, out []metrics.Metric) error {
 	data, err := json.MarshalIndent(out, "", "   ")
 	if err != nil {
 		return err

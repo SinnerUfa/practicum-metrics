@@ -13,13 +13,14 @@ func Run(ctx context.Context, cfg Config) error {
 		repository.Config{
 			StoreInterval:   cfg.StoreInterval,
 			FileStoragePath: cfg.FileStoragePath,
-			Restore:         true,
+			Restore:         cfg.Restore,
 			DatabaseDSN:     cfg.DatabaseDSN,
 		})
 	if err != nil {
 		slog.Warn("repository start with error", "err", err)
 		return err
 	}
+	slog.Info("repository open")
 
 	httpServer := &http.Server{
 		Addr:    cfg.Adress,

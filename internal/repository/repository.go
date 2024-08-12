@@ -46,6 +46,7 @@ func New(ctx context.Context, cfg Config) (*Repository, error) {
 			return nil, err
 		}
 		r.storage = storage
+		return r, nil
 	}
 	r.storageType = MemoryStorageType
 	r.storage = memory.New()

@@ -24,7 +24,6 @@ func (m *MetricPost) Post() {
 	client := resty.New()
 
 	endpoint := "http://" + m.adress + "/update/"
-	slog.Debug("", "l", l)
 	for i, v := range l {
 		req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip").SetBody(v)
 		p, err := req.Post(endpoint)
@@ -34,6 +33,7 @@ func (m *MetricPost) Post() {
 			slog.Warn("", "err", err, "i", i, "value", v)
 		}
 	}
+	m.counter++
 	slog.Debug("Post metrics", "increment", m.counter)
 }
 
