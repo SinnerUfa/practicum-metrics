@@ -18,6 +18,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	if err != nil {
 		return nil, err
 	}
+	// создание таблиц
 	return &Database{db: db}, nil
 }
 
