@@ -21,7 +21,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	return &Database{db: db}, nil
 }
 
-func (d *Database) Set(m metrics.Metric) error {
+func (d *Database) SetContext(ctx context.Context, m metrics.Metric) error {
 	if m.Name == "" {
 		return codes.ErrRepMetricNotSupported
 	}
@@ -34,9 +34,9 @@ func (d *Database) Set(m metrics.Metric) error {
 	return nil
 }
 
-func (d *Database) Get(m *metrics.Metric) error {
+func (d *Database) GetContext(ctx context.Context, m *metrics.Metric) error {
 	if m.Name == "ping" && m.Type == "" && m.Value.IsString() && m.Value.String() == "ping" {
-		return d.db.Ping()
+		return d.db.PingContext(ctx)
 	}
 	switch m.Type {
 	case metrics.MetricTypeCounter:
@@ -47,11 +47,11 @@ func (d *Database) Get(m *metrics.Metric) error {
 	return nil
 }
 
-func (d *Database) GetList() (out []metrics.Metric) {
+func (d *Database) GetListContext(ctx context.Context) (out []metrics.Metric) {
 	return
 }
 
-func (d *Database) SetList(in []metrics.Metric) error {
+func (d *Database) SetListContext(ctx context.Context, in []metrics.Metric) error {
 	return nil
 }
 
