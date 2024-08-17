@@ -73,7 +73,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	if _, err := db.Exec(CreateTableGauges); err != nil {
 		return nil, errors.Join(err, db.Close())
 	}
-	DB := &Database{db: db}
+	DB := &Database{db: db, stmts: make(map[string]*sql.Stmt, 0)}
 	for name, query := range dbQueries {
 		stmt, err := db.Prepare(query)
 		if err != nil {
