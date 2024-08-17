@@ -6,6 +6,8 @@ import (
 	"errors"
 	"time"
 
+	"golang.org/x/exp/slog"
+
 	"github.com/SinnerUfa/practicum-metric/internal/codes"
 	"github.com/SinnerUfa/practicum-metric/internal/metrics"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -75,6 +77,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	for name, query := range dbQueries {
 		stmt, err := db.Prepare(query)
 		if err != nil {
+			slog.Warn("Prepare", "query", query, "err", err)
 			return nil, errors.Join(err, DB.Close())
 		}
 		DB.stmts[name] = stmt
