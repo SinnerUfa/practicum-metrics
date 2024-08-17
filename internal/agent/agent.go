@@ -18,7 +18,7 @@ func Run(ctx context.Context, cfg Config) error {
 	slog.Info("repository storge type", "type", rep.Type())
 
 	loader := ticker.NewAndRun(ctx, cfg.PollInterval, NewLoader(rep.Storage()))
-	poster := ticker.NewAndRun(ctx, cfg.ReportInterval, NewPoster(rep.Storage(), cfg.Adress))
+	poster := ticker.NewAndRun(ctx, cfg.ReportInterval, NewPoster(rep.Storage(), cfg.Adress, cfg.ReportNoBatch))
 
 	<-ctx.Done()
 	loader.Close()
