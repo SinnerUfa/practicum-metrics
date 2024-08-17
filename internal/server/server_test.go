@@ -128,7 +128,8 @@ func Test_Hundlers(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
-	slog.Debug("rep void ", "list", store.GetList())
+	s, _ := store.GetList()
+	slog.Debug("rep void ", "list", s)
 	for _, test := range testsPostVoid {
 		t.Run("testsPostVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, test.req, nil)
@@ -147,7 +148,8 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
-	slog.Debug("rep posted", "list", store.GetList())
+	s, _ = store.GetList()
+	slog.Debug("rep posted", "list", s)
 	for _, test := range testsGet {
 		t.Run("testsGet", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
@@ -166,5 +168,6 @@ func Test_Hundlers(t *testing.T) {
 			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
 		})
 	}
-	slog.Debug("rep endless", "list", store.GetList())
+	s, _ = store.GetList()
+	slog.Debug("rep endless", "list", s)
 }

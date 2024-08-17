@@ -81,7 +81,7 @@ func (ma *MemoryStorageAdapter) SetListContext(_ context.Context, in []metrics.M
 	return ma.Memory.SetList(in)
 }
 
-func (ma *MemoryStorageAdapter) GetListContext(_ context.Context) (out []metrics.Metric) {
+func (ma *MemoryStorageAdapter) GetListContext(_ context.Context) ([]metrics.Metric, error) {
 	return ma.Memory.GetList()
 }
 
@@ -101,7 +101,7 @@ func (ua *UnloadStorageAdapter) SetListContext(_ context.Context, in []metrics.M
 	return ua.Unload.SetList(in)
 }
 
-func (ua *UnloadStorageAdapter) GetListContext(_ context.Context) (out []metrics.Metric) {
+func (ua *UnloadStorageAdapter) GetListContext(_ context.Context) ([]metrics.Metric, error) {
 	return ua.Unload.GetList()
 }
 
@@ -121,7 +121,7 @@ func (dba *DBStorageAdapter) SetList(m []metrics.Metric) error {
 	return dba.Database.SetListContext(context.Background(), m)
 }
 
-func (dba *DBStorageAdapter) GetList() (out []metrics.Metric) {
+func (dba *DBStorageAdapter) GetList() (out []metrics.Metric, err error) {
 	return dba.Database.GetListContext(context.Background())
 }
 

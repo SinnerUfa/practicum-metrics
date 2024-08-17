@@ -1,7 +1,6 @@
 package agent
 
 import (
-	"context"
 	"log/slog"
 
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
@@ -10,17 +9,16 @@ import (
 
 type MetricPost struct {
 	rep     repository.Storage
-	ctx     context.Context
 	adress  string
 	counter uint
 }
 
-func NewPoster(ctx context.Context, rep repository.Storage, adress string) *MetricPost {
-	return &MetricPost{ctx: ctx, rep: rep, adress: adress}
+func NewPoster(rep repository.Storage, adress string) *MetricPost {
+	return &MetricPost{rep: rep, adress: adress}
 }
 
 func (m *MetricPost) Post() {
-	l := m.rep.GetList()
+	l, _ := m.rep.GetList()
 	client := resty.New()
 
 	endpoint := "http://" + m.adress + "/update/"

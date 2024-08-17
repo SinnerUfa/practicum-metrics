@@ -58,7 +58,12 @@ func GetList(getter metrics.ListGetter) http.HandlerFunc {
 				slog.Warn("", "err", codes.ErrGetLstParse)
 				return
 			}
-			metrs := getter.GetList()
+			metrs, err := getter.GetList()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				slog.Warn("", "err", err)
+				return
+			}
 			slices.SortFunc(metrs, func(a, b metrics.Metric) int {
 				return cmp.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name))
 			})

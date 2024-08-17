@@ -59,14 +59,16 @@ func (u *Unload) Set(m metrics.Metric) error {
 		if err := u.Memory.Set(m); err != nil {
 			return err
 		}
-		return unload(u.file, u.Memory.GetList())
+		m, _ := u.Memory.GetList()
+		return unload(u.file, m)
 	}
 	return u.Memory.Set(m)
 }
 
 func (u *Unload) Tick() {
 	slog.Debug("repository unload start")
-	if err := unload(u.file, u.Memory.GetList()); err != nil {
+	m, _ := u.Memory.GetList()
+	if err := unload(u.file, m); err != nil {
 		slog.Warn("repository unload error", "err", err)
 		return
 	}

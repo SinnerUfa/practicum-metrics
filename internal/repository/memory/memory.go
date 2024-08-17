@@ -101,7 +101,7 @@ func (mem *Memory) Get(m *metrics.Metric) error {
 	return nil
 }
 
-func (mem *Memory) GetList() (out []metrics.Metric) {
+func (mem *Memory) GetList() (out []metrics.Metric, err error) {
 	mem.RLock()
 	defer mem.RUnlock()
 	for k, v := range mem.Counters {
