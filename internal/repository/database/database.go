@@ -11,43 +11,43 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-const MAX_CONNS int = 10
+const MaxConns int = 10
 
 const (
-	CREATE_TABLE_COUNTERS string = `CREATE TABLE IF NOT EXISTS counters (
+	CreateTableCounters string = `CREATE TABLE IF NOT EXISTS counters (
                                         cnt_name character varying NOT NULL,
                                         cnt_value bigint NOT NULL,
                                         CONSTRAINT cnt_name_prim PRIMARY KEY (cnt_name)
                                     );`
 
-	INSERT_INTO_COUNTERS string = ` INSERT INTO counters ( cnt_name, cnt_value ) VALUES ( @name, @value )
+	InsertIntoCounters string = ` INSERT INTO counters ( cnt_name, cnt_value ) VALUES ( @name, @value )
                                     ON CONFLICT ON CONSTRAINT cnt_name_prim DO
                                     UPDATE SET cnt_value = counters.cnt_value + EXCLUDED.cnt_value;`
 
-	SELECT_ALL_COUNTERS  string = `SELECT counters.cnt_name, counters.cnt_value FROM counters;`
-	SELECT_NAME_COUNTERS string = `SELECT counters.cnt_value FROM counters WHERE counters.cnt_name = @name LIMIT 1;`
+	SelectAllCounters  string = `SELECT counters.cnt_name, counters.cnt_value FROM counters;`
+	SelectNameCounters string = `SELECT counters.cnt_value FROM counters WHERE counters.cnt_name = @name LIMIT 1;`
 
-	CREATE_TABLE_GAUGES string = `CREATE TABLE IF NOT EXISTS gauges (
+	CreateTableGauges string = `CREATE TABLE IF NOT EXISTS gauges (
                                     gau_name character varying NOT NULL,
                                     gau_value double precision NOT NULL,
                                     CONSTRAINT gau_name_prim PRIMARY KEY (gau_name)
                                 );`
 
-	INSERT_INTO_GAUGES string = `INSERT INTO gauges (gau_name, gau_value) VALUES (@name, @value)
+	InsertIntoGauges string = `INSERT INTO gauges (gau_name, gau_value) VALUES (@name, @value)
                                 ON CONFLICT ON CONSTRAINT gau_name_prim DO
                                 UPDATE SET gau_value = EXCLUDED.gau_value;`
 
-	SELECT_ALL_GAUGES  string = `SELECT gauges.gau_name, gauges.gau_value FROM gauges;`
-	SELECT_NAME_GAUGES string = `SELECT gauges.gau_value FROM gauges WHERE gauges.gau_name = @name LIMIT 1;`
+	SelectAllGauges  string = `SELECT gauges.gau_name, gauges.gau_value FROM gauges;`
+	SelectNameGauges string = `SELECT gauges.gau_value FROM gauges WHERE gauges.gau_name = @name LIMIT 1;`
 )
 
 var dbQueries map[string]string = map[string]string{
-	"InsertCounters":     INSERT_INTO_COUNTERS,
-	"SelectCounters":     SELECT_ALL_COUNTERS,
-	"SelectNameCounters": SELECT_NAME_COUNTERS,
-	"InsertGauges":       INSERT_INTO_GAUGES,
-	"SelectGauges":       SELECT_ALL_GAUGES,
-	"SelectNameGauges":   SELECT_NAME_GAUGES,
+	"InsertCounters":     InsertIntoCounters,
+	"SelectCounters":     SelectAllCounters,
+	"SelectNameCounters": SelectNameCounters,
+	"InsertGauges":       InsertIntoGauges,
+	"SelectGauges":       SelectAllGauges,
+	"SelectNameGauges":   SelectNameGauges,
 }
 
 type Database struct {
@@ -60,15 +60,15 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	if err != nil {
 		return nil, errors.Join(err, db.Close())
 	}
-	db.SetMaxOpenConns(MAX_CONNS)
-	db.SetMaxIdleConns(MAX_CONNS)
+	db.SetMaxOpenConns(MaxConns)
+	db.SetMaxIdleConns(MaxConns)
 	db.SetConnMaxIdleTime(4 * time.Minute)
 	db.SetConnMaxLifetime(15 * time.Minute)
 
-	if _, err := db.Exec(CREATE_TABLE_COUNTERS); err != nil {
+	if _, err := db.Exec(CreateTableCounters); err != nil {
 		return nil, errors.Join(err, db.Close())
 	}
-	if _, err := db.Exec(CREATE_TABLE_GAUGES); err != nil {
+	if _, err := db.Exec(CreateTableGauges); err != nil {
 		return nil, errors.Join(err, db.Close())
 	}
 	DB := &Database{db: db}
@@ -121,7 +121,6 @@ func (d *Database) SetContext(ctx context.Context, m metrics.Metric) error {
 	default:
 		return codes.ErrRepMetricNotSupported
 	}
-	return nil
 }
 
 func (d *Database) GetContext(ctx context.Context, m *metrics.Metric) error {
