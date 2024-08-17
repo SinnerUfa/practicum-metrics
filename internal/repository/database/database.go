@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
 
 	"github.com/SinnerUfa/practicum-metric/internal/codes"
 	"github.com/SinnerUfa/practicum-metric/internal/metrics"
@@ -22,12 +22,12 @@ const (
                                         CONSTRAINT cnt_name_prim PRIMARY KEY (cnt_name)
                                     );`
 
-	InsertIntoCounters string = ` INSERT INTO counters ( cnt_name, cnt_value ) VALUES ( @name, @value )
+	InsertIntoCounters string = ` INSERT INTO counters ( cnt_name, cnt_value ) VALUES ( $1, $2 )
                                     ON CONFLICT ON CONSTRAINT cnt_name_prim DO
                                     UPDATE SET cnt_value = counters.cnt_value + EXCLUDED.cnt_value;`
 
 	SelectAllCounters  string = `SELECT counters.cnt_name, counters.cnt_value FROM counters;`
-	SelectNameCounters string = `SELECT counters.cnt_value FROM counters WHERE counters.cnt_name = @name LIMIT 1;`
+	SelectNameCounters string = `SELECT counters.cnt_value FROM counters WHERE counters.cnt_name = $1 LIMIT 1;`
 
 	CreateTableGauges string = `CREATE TABLE IF NOT EXISTS gauges (
                                     gau_name character varying NOT NULL,
@@ -35,12 +35,12 @@ const (
                                     CONSTRAINT gau_name_prim PRIMARY KEY (gau_name)
                                 );`
 
-	InsertIntoGauges string = `INSERT INTO gauges (gau_name, gau_value) VALUES (@name, @value)
+	InsertIntoGauges string = `INSERT INTO gauges (gau_name, gau_value) VALUES ($1, $2)
                                 ON CONFLICT ON CONSTRAINT gau_name_prim DO
                                 UPDATE SET gau_value = EXCLUDED.gau_value;`
 
 	SelectAllGauges  string = `SELECT gauges.gau_name, gauges.gau_value FROM gauges;`
-	SelectNameGauges string = `SELECT gauges.gau_value FROM gauges WHERE gauges.gau_name = @name LIMIT 1;`
+	SelectNameGauges string = `SELECT gauges.gau_value FROM gauges WHERE gauges.gau_name = $1 LIMIT 1;`
 )
 
 var dbQueries map[string]string = map[string]string{
@@ -101,7 +101,7 @@ func (d *Database) SetContext(ctx context.Context, m metrics.Metric) error {
 			return err
 		}
 		txStmt := tx.Stmt(d.stmts["InsertCounters"])
-		_, err = txStmt.ExecContext(ctx, sql.Named("name", m.Name), sql.Named("value", v))
+		_, err = txStmt.ExecContext(ctx, m.Name, v)
 		if err != nil {
 			return errors.Join(err, tx.Rollback())
 		}
@@ -116,7 +116,7 @@ func (d *Database) SetContext(ctx context.Context, m metrics.Metric) error {
 			return err
 		}
 		txStmt := tx.Stmt(d.stmts["InsertGauges"])
-		_, err = txStmt.ExecContext(ctx, sql.Named("name", m.Name), sql.Named("value", v))
+		_, err = txStmt.ExecContext(ctx, m.Name, v)
 		if err != nil {
 			return errors.Join(err, tx.Rollback())
 		}
@@ -133,7 +133,7 @@ func (d *Database) GetContext(ctx context.Context, m *metrics.Metric) error {
 	switch m.Type {
 	case metrics.MetricTypeCounter:
 		var value int64
-		r := d.stmts["SelectNameCounters"].QueryRowContext(ctx, sql.Named("name", m.Name))
+		r := d.stmts["SelectNameCounters"].QueryRowContext(ctx, m.Name)
 		err := r.Scan(&value)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -144,7 +144,7 @@ func (d *Database) GetContext(ctx context.Context, m *metrics.Metric) error {
 		m.Value = metrics.Int(value)
 	case metrics.MetricTypeGauge:
 		var value float64
-		r := d.stmts["SelectNameGauges"].QueryRowContext(ctx, sql.Named("name", m.Name))
+		r := d.stmts["SelectNameGauges"].QueryRowContext(ctx, m.Name)
 		err := r.Scan(&value)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -182,14 +182,14 @@ func (d *Database) SetListContext(ctx context.Context, in []metrics.Metric) erro
 				err = codes.ErrRepParseInt
 				break
 			}
-			_, err = txStmtCnt.ExecContext(ctx, sql.Named("name", m.Name), sql.Named("value", v))
+			_, err = txStmtCnt.ExecContext(ctx, m.Name, v)
 		case metrics.MetricTypeGauge:
 			v, ok := m.Value.Float64()
 			if !ok {
 				err = codes.ErrRepParseFloat
 				break
 			}
-			_, err = txStmtGau.ExecContext(ctx, sql.Named("name", m.Name), sql.Named("value", v))
+			_, err = txStmtGau.ExecContext(ctx, m.Name, v)
 		default:
 			err = codes.ErrRepMetricNotSupported
 		}
