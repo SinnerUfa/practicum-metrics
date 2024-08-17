@@ -20,6 +20,7 @@ func Routes(rep repository.Storage) http.Handler {
 		r.Get("/value/{type}/{name}", hundlers.GetValue(rep))
 		r.Post("/update/", hundlers.PostJSONUpdate(rep))
 		r.Post("/value/", hundlers.PostJSONValue(rep))
+		r.Post("/updates/", hundlers.PostUpdates(rep))
 	})
 
 	return r
