@@ -11,9 +11,13 @@ import (
 	mlog "github.com/SinnerUfa/practicum-metric/internal/mlog"
 )
 
-var cfg = agent.DefaultConfig
-
 func main() {
+	cfg := agent.Config{
+		Adress:         agent.DefaultAdress,
+		ReportInterval: agent.DefaultReportInterval,
+		PollInterval:   agent.DefaultPollInterval,
+		ReportNoBatch:  agent.DefaultReportNoBatch,
+	}
 	slog.SetDefault(mlog.New(mlog.ZapType, slog.LevelDebug))
 
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {

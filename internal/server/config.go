@@ -8,10 +8,10 @@ type Config struct {
 	DatabaseDSN     string `env:"DATABASE_DSN" flag:"d"`
 }
 
-var DefaultConfig = Config{
-	Adress:          "localhost:8080",
-	StoreInterval:   300,
-	FileStoragePath: "/tmp/metrics-db.json",
-	Restore:         true,
-	DatabaseDSN:     "",
-}
+const (
+	DefaultAdress          = "localhost:8080"
+	DefaultStoreInterval   = 300
+	DefaultFileStoragePath = "/tmp/metrics-db.json"
+	DefaultRestore         = true
+	DefaultDatabaseDSN     = ""
+)

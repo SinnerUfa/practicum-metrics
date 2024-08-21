@@ -11,9 +11,14 @@ import (
 	server "github.com/SinnerUfa/practicum-metric/internal/server"
 )
 
-var cfg server.Config = server.DefaultConfig
-
 func main() {
+	cfg := server.Config{
+		Adress:          server.DefaultAdress,
+		StoreInterval:   server.DefaultStoreInterval,
+		FileStoragePath: server.DefaultFileStoragePath,
+		Restore:         server.DefaultRestore,
+		DatabaseDSN:     server.DefaultDatabaseDSN,
+	}
 	slog.SetDefault(mlog.New(mlog.ZapType, slog.LevelDebug))
 
 	if err := config.Load(&cfg, os.Args[1:]); err != nil {

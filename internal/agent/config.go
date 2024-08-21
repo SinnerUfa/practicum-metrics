@@ -7,9 +7,9 @@ type Config struct {
 	ReportNoBatch  bool   `env:"REPORT_NOBATCH" flag:"nob"`
 }
 
-var DefaultConfig = Config{
-	Adress:         "localhost:8080",
-	ReportInterval: 10,
-	PollInterval:   2,
-	ReportNoBatch:  true,
-}
+const (
+	DefaultAdress         = "localhost:8080"
+	DefaultReportInterval = 10
+	DefaultPollInterval   = 2
+	DefaultReportNoBatch  = true
+)
