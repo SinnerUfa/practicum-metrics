@@ -20,10 +20,8 @@ func NewPoster(rep repository.Storage, adress string, noBatch bool) *MetricPost 
 }
 
 func (m *MetricPost) Post() (err error) {
-	l, err := m.rep.GetList()
-	if err != nil {
-		return
-	}
+	l, _ := m.rep.GetList()
+
 	client := resty.New()
 	if m.noBatch {
 		endpoint := "http://" + m.adress + "/update/"
