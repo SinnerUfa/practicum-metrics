@@ -14,31 +14,31 @@ import (
 const MaxConns int = 10
 
 const (
-	CreateTableCounters string = `CREATE TABLE IF NOT EXISTS counters (
+	CreateTableCounters = `CREATE TABLE IF NOT EXISTS counters (
                                         cnt_name character varying NOT NULL,
                                         cnt_value bigint NOT NULL,
                                         CONSTRAINT cnt_name_prim PRIMARY KEY (cnt_name)
                                     );`
 
-	InsertIntoCounters string = ` INSERT INTO counters ( cnt_name, cnt_value ) VALUES ( $1, $2 )
+	InsertIntoCounters = `INSERT INTO counters ( cnt_name, cnt_value ) VALUES ( $1, $2 )
                                     ON CONFLICT ON CONSTRAINT cnt_name_prim DO
                                     UPDATE SET cnt_value = counters.cnt_value + EXCLUDED.cnt_value;`
 
-	SelectAllCounters  string = `SELECT counters.cnt_name, counters.cnt_value FROM counters;`
-	SelectNameCounters string = `SELECT counters.cnt_value FROM counters WHERE counters.cnt_name = $1 LIMIT 1;`
+	SelectAllCounters  = `SELECT counters.cnt_name, counters.cnt_value FROM counters;`
+	SelectNameCounters = `SELECT counters.cnt_value FROM counters WHERE counters.cnt_name = $1 LIMIT 1;`
 
-	CreateTableGauges string = `CREATE TABLE IF NOT EXISTS gauges (
+	CreateTableGauges = `CREATE TABLE IF NOT EXISTS gauges (
                                     gau_name character varying NOT NULL,
                                     gau_value double precision NOT NULL,
                                     CONSTRAINT gau_name_prim PRIMARY KEY (gau_name)
                                 );`
 
-	InsertIntoGauges string = `INSERT INTO gauges (gau_name, gau_value) VALUES ($1, $2)
+	InsertIntoGauges = `INSERT INTO gauges (gau_name, gau_value) VALUES ($1, $2)
                                 ON CONFLICT ON CONSTRAINT gau_name_prim DO
                                 UPDATE SET gau_value = EXCLUDED.gau_value;`
 
-	SelectAllGauges  string = `SELECT gauges.gau_name, gauges.gau_value FROM gauges;`
-	SelectNameGauges string = `SELECT gauges.gau_value FROM gauges WHERE gauges.gau_name = $1 LIMIT 1;`
+	SelectAllGauges  = `SELECT gauges.gau_name, gauges.gau_value FROM gauges;`
+	SelectNameGauges = `SELECT gauges.gau_value FROM gauges WHERE gauges.gau_name = $1 LIMIT 1;`
 )
 
 var dbQueries map[string]string = map[string]string{
