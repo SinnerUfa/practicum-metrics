@@ -51,10 +51,11 @@ func (m *MetricPost) Post() (err error) {
 }
 
 func (m *MetricPost) Tick() {
-	for _, delay := range []time.Duration{time.Second, 3 * time.Second, 5 * time.Second} {
+	delays := []int{1, 3, 5}
+	for _, delay := range delays {
 		err := m.Post()
 		if err != nil {
-			time.Sleep(delay)
+			time.Sleep(time.Duration(delay) * time.Second)
 		} else {
 			break
 		}
