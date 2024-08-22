@@ -70,10 +70,10 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	db.SetConnMaxIdleTime(4 * time.Minute)
 	db.SetConnMaxLifetime(15 * time.Minute)
 
-	if _, err := db.Exec(CreateTableCounters); err != nil {
+	if _, err = db.Exec(CreateTableCounters); err != nil {
 		return nil, err
 	}
-	if _, err := db.Exec(CreateTableGauges); err != nil {
+	if _, err = db.Exec(CreateTableGauges); err != nil {
 		return nil, err
 	}
 	DB := &Database{db: db, stmts: make(map[string]*sql.Stmt, 0)}
