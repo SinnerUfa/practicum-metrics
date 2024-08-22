@@ -10,7 +10,7 @@ import (
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
 )
 
-func PostUpdates(setter metrics.ListSetterWithContext) http.HandlerFunc {
+func PostUpdates(setter metrics.ListSetter) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 
@@ -34,7 +34,7 @@ func PostUpdates(setter metrics.ListSetterWithContext) http.HandlerFunc {
 				return
 			}
 
-			switch err := setter.SetListWithContext(r.Context(), *metr); err {
+			switch err := setter.SetList(r.Context(), *metr); err {
 			case nil:
 			case codes.ErrRepParseInt, codes.ErrRepParseFloat, codes.ErrRepMetricNotSupported:
 				http.Error(w, err.Error(), http.StatusBadRequest)

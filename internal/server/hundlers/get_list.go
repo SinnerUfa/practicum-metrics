@@ -57,7 +57,7 @@ func GetList(getter metrics.ListGetter) http.HandlerFunc {
 				slog.Warn("", "err", codes.ErrGetLstParse)
 				return
 			}
-			metrs, err := getter.GetList()
+			metrs, err := getter.GetList(r.Context())
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				slog.Warn("", "err", err)

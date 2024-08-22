@@ -22,10 +22,6 @@ type Storage interface {
 	metrics.Getter
 	metrics.ListSetter
 	metrics.ListGetter
-	metrics.SetterWithContext
-	metrics.GetterWithContext
-	metrics.ListSetterWithContext
-	metrics.ListGetterWithContext
 }
 
 type Config struct {
@@ -69,19 +65,19 @@ type MemoryStorageAdapter struct {
 	*memory.Memory
 }
 
-func (ma *MemoryStorageAdapter) SetWithContext(_ context.Context, m metrics.Metric) error {
+func (ma *MemoryStorageAdapter) Set(_ context.Context, m metrics.Metric) error {
 	return ma.Memory.Set(m)
 }
 
-func (ma *MemoryStorageAdapter) GetWithContext(_ context.Context, m *metrics.Metric) error {
+func (ma *MemoryStorageAdapter) Get(_ context.Context, m *metrics.Metric) error {
 	return ma.Memory.Get(m)
 }
 
-func (ma *MemoryStorageAdapter) SetListWithContext(_ context.Context, in []metrics.Metric) error {
+func (ma *MemoryStorageAdapter) SetList(_ context.Context, in []metrics.Metric) error {
 	return ma.Memory.SetList(in)
 }
 
-func (ma *MemoryStorageAdapter) GetListWithContext(_ context.Context) ([]metrics.Metric, error) {
+func (ma *MemoryStorageAdapter) GetList(_ context.Context) ([]metrics.Metric, error) {
 	return ma.Memory.GetList()
 }
 
@@ -89,19 +85,19 @@ type UnloadStorageAdapter struct {
 	*unload.Unload
 }
 
-func (ua *UnloadStorageAdapter) SetWithContext(_ context.Context, m metrics.Metric) error {
+func (ua *UnloadStorageAdapter) Set(_ context.Context, m metrics.Metric) error {
 	return ua.Unload.Set(m)
 }
 
-func (ua *UnloadStorageAdapter) GetWithContext(_ context.Context, m *metrics.Metric) error {
+func (ua *UnloadStorageAdapter) Get(_ context.Context, m *metrics.Metric) error {
 	return ua.Unload.Get(m)
 }
 
-func (ua *UnloadStorageAdapter) SetListWithContext(_ context.Context, in []metrics.Metric) error {
+func (ua *UnloadStorageAdapter) SetList(_ context.Context, in []metrics.Metric) error {
 	return ua.Unload.SetList(in)
 }
 
-func (ua *UnloadStorageAdapter) GetListWithContext(_ context.Context) ([]metrics.Metric, error) {
+func (ua *UnloadStorageAdapter) GetList(_ context.Context) ([]metrics.Metric, error) {
 	return ua.Unload.GetList()
 }
 
@@ -109,20 +105,20 @@ type DBStorageAdapter struct {
 	*database.Database
 }
 
-func (dba *DBStorageAdapter) Set(m metrics.Metric) error {
-	return dba.Database.SetWithContext(context.Background(), m)
+func (dba *DBStorageAdapter) Set(ctx context.Context, m metrics.Metric) error {
+	return dba.Database.Set(ctx, m)
 }
 
-func (dba *DBStorageAdapter) Get(m *metrics.Metric) error {
-	return dba.Database.GetWithContext(context.Background(), m)
+func (dba *DBStorageAdapter) Get(ctx context.Context, m *metrics.Metric) error {
+	return dba.Database.Get(ctx, m)
 }
 
-func (dba *DBStorageAdapter) SetList(m []metrics.Metric) error {
-	return dba.Database.SetListWithContext(context.Background(), m)
+func (dba *DBStorageAdapter) SetList(ctx context.Context, in []metrics.Metric) error {
+	return dba.Database.SetList(ctx, in)
 }
 
-func (dba *DBStorageAdapter) GetList() (out []metrics.Metric, err error) {
-	return dba.Database.GetListWithContext(context.Background())
+func (dba *DBStorageAdapter) GetList(ctx context.Context) (out []metrics.Metric, err error) {
+	return dba.Database.GetList(ctx)
 }
 
 func (r *Repository) Storage() Storage {

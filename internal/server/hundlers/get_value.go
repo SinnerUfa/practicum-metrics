@@ -29,7 +29,8 @@ func GetValue(getter metrics.Getter) http.HandlerFunc {
 				return
 			}
 
-			switch getter.Get(metr) {
+			switch err := getter.Get(r.Context(), metr); err {
+			case nil:
 			case codes.ErrRepNotFound:
 				http.Error(w, codes.ErrRepNotFound.Error(), http.StatusNotFound)
 				slog.Warn("", "err", codes.ErrRepNotFound)
@@ -37,6 +38,10 @@ func GetValue(getter metrics.Getter) http.HandlerFunc {
 			case codes.ErrRepMetricNotSupported:
 				http.Error(w, codes.ErrRepMetricNotSupported.Error(), http.StatusBadRequest)
 				slog.Warn("", "err", codes.ErrRepMetricNotSupported)
+				return
+			default:
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				slog.Warn("", "err", err)
 				return
 			}
 

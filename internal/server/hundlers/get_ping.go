@@ -14,7 +14,7 @@ func GetPing(getter metrics.Getter) http.HandlerFunc {
 				Type:  "",
 				Value: metrics.String("ping"),
 			}
-			if err := getter.Get(metr); err != nil {
+			if err := getter.Get(r.Context(), metr); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

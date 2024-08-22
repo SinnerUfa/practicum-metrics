@@ -35,9 +35,14 @@ func PostUpdate(setter metrics.Setter) http.HandlerFunc {
 				slog.Warn("", "err", codes.ErrGetValReqType)
 				return
 			}
-			switch err := setter.Set(*metr); err {
+			switch err := setter.Set(r.Context(), *metr); err {
+			case nil:
 			case codes.ErrRepParseInt, codes.ErrRepParseFloat, codes.ErrRepMetricNotSupported:
 				http.Error(w, err.Error(), http.StatusBadRequest)
+				slog.Warn("", "err", err)
+				return
+			default:
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				slog.Warn("", "err", err)
 				return
 			}

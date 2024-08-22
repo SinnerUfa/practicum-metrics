@@ -88,7 +88,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 	return DB, nil
 }
 
-func (d *Database) SetWithContext(ctx context.Context, m metrics.Metric) error {
+func (d *Database) Set(ctx context.Context, m metrics.Metric) error {
 	if m.Name == "" {
 		return codes.ErrRepMetricNotSupported
 	}
@@ -128,7 +128,7 @@ func (d *Database) SetWithContext(ctx context.Context, m metrics.Metric) error {
 	}
 }
 
-func (d *Database) GetWithContext(ctx context.Context, m *metrics.Metric) error {
+func (d *Database) Get(ctx context.Context, m *metrics.Metric) error {
 	if m.Name == "ping" && m.Type == "" && m.Value.IsString() && m.Value.String() == "ping" {
 		return d.db.PingContext(ctx)
 	}
@@ -161,7 +161,7 @@ func (d *Database) GetWithContext(ctx context.Context, m *metrics.Metric) error 
 	return nil
 }
 
-func (d *Database) SetListWithContext(ctx context.Context, in []metrics.Metric) error {
+func (d *Database) SetList(ctx context.Context, in []metrics.Metric) error {
 	var err error
 
 	tx, err := d.db.BeginTx(ctx, nil)
@@ -206,7 +206,7 @@ func (d *Database) SetListWithContext(ctx context.Context, in []metrics.Metric) 
 	return tx.Commit()
 }
 
-func (d *Database) GetListWithContext(ctx context.Context) (out []metrics.Metric, err error) {
+func (d *Database) GetList(ctx context.Context) (out []metrics.Metric, err error) {
 	rCnts, err := d.stmts["SelectCounters"].QueryContext(ctx)
 	if err != nil {
 		return nil, err

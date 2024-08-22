@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"time"
 
+	"context"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 	resty "github.com/go-resty/resty/v2"
 )
@@ -20,7 +21,7 @@ func NewPoster(rep repository.Storage, adress string, noBatch bool) *MetricPost 
 }
 
 func (m *MetricPost) Post() (err error) {
-	l, err := m.rep.GetList()
+	l, err := m.rep.GetList(context.Background())
 	if err != nil {
 		return
 	}

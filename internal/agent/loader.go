@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"runtime"
 
+	"context"
 	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
 )
 
@@ -23,7 +24,7 @@ func (m *MetricLoad) Load() {
 	l = append(l, metrics.Metric{Name: "PollCount", Type: metrics.MetricTypeCounter, Value: metrics.Uint(m.counter)})
 	l = append(l, metrics.Metric{Name: "RandomValue", Type: metrics.MetricTypeGauge, Value: metrics.Int(rand.Int())})
 
-	m.setter.SetList(l)
+	m.setter.SetList(context.Background(), l)
 	m.counter++
 	slog.Debug("load metrics", "increment", m.counter)
 }
