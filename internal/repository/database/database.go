@@ -58,24 +58,29 @@ type Database struct {
 func New(ctx context.Context, dsn string) (*Database, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
-		return nil, errors.Join(err, db.Close())
+		return nil, err
 	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, db.Close())
+		}
+	}()
 	db.SetMaxOpenConns(MaxConns)
 	db.SetMaxIdleConns(MaxConns)
 	db.SetConnMaxIdleTime(4 * time.Minute)
 	db.SetConnMaxLifetime(15 * time.Minute)
 
 	if _, err := db.Exec(CreateTableCounters); err != nil {
-		return nil, errors.Join(err, db.Close())
+		return nil, err
 	}
 	if _, err := db.Exec(CreateTableGauges); err != nil {
-		return nil, errors.Join(err, db.Close())
+		return nil, err
 	}
 	DB := &Database{db: db, stmts: make(map[string]*sql.Stmt, 0)}
 	for name, query := range dbQueries {
 		stmt, err := db.Prepare(query)
 		if err != nil {
-			return nil, errors.Join(err, DB.Close())
+			return nil, err
 		}
 		DB.stmts[name] = stmt
 	}
