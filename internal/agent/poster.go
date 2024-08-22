@@ -24,14 +24,14 @@ func (m *MetricPost) Post() (err error) {
 	if err != nil {
 		return
 	}
+
 	client := resty.New()
 	if m.noBatch {
 		endpoint := "http://" + m.adress + "/update/"
 		for i, v := range l {
 			req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip").SetBody(v)
 			p, err := req.Post(endpoint)
-			slog.Debug("", "req.Body", req.Body)
-			slog.Debug("", "content-encoding", p.Header().Get("Content-Encoding"), "response", p.String())
+			slog.Debug("request", "body", req.Body, "encoding", p.Header().Get("Content-Encoding"), "response", p.String())
 			if err != nil {
 				slog.Warn("", "err", err, "i", i, "value", v)
 			}
@@ -40,32 +40,21 @@ func (m *MetricPost) Post() (err error) {
 		endpoint := "http://" + m.adress + "/updates/"
 		req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip").SetBody(l)
 		p, err := req.Post(endpoint)
-		slog.Debug("", "req.Body", req.Body)
-		slog.Debug("", "content-encoding", p.Header().Get("Content-Encoding"), "response", p.String())
+		slog.Debug("request", "body", req.Body, "encoding", p.Header().Get("Content-Encoding"), "response", p.String())
 		if err != nil {
 			slog.Warn("", "err", err, "l", l)
 		}
 	}
 	m.counter++
-	slog.Debug("Post metrics", "increment", m.counter)
+	slog.Debug("post metrics", "increment", m.counter)
 	return err
 }
 
 func (m *MetricPost) Tick() {
-	var delay int
-
-	for counter := 0; counter < 3; counter++ {
+	for _, delay := range []time.Duration{time.Second, 3 * time.Second, 5 * time.Second} {
 		err := m.Post()
-		switch counter {
-		case 0:
-			delay = 1
-		case 1:
-			delay = 3
-		case 2:
-			delay = 5
-		}
 		if err != nil {
-			time.Sleep(time.Duration(delay) * time.Second)
+			time.Sleep(time.Duration(delay))
 		} else {
 			break
 		}
