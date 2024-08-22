@@ -52,7 +52,6 @@ func GetList(getter metrics.ListGetter) http.HandlerFunc {
 			}
 			t.Funcs(funcMap)
 			t, err := t.Parse(tpi)
-			// t, err := t.ParseFiles("body_list.html", "index.html") // NOT WORK WITH FUNCS???
 			if err != nil {
 				http.Error(w, codes.ErrRepNotFound.Error(), http.StatusInternalServerError)
 				slog.Warn("", "err", codes.ErrGetLstParse)
