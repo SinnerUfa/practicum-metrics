@@ -20,18 +20,18 @@ type ListGetter interface {
 	GetList() (out []Metric, err error)
 }
 
-type ContextSetter interface {
-	SetContext(ctx context.Context, m Metric) error
+type SetterWithContext interface {
+	SetWithContext(ctx context.Context, m Metric) error
 }
 
-type ContextGetter interface {
-	GetContext(ctx context.Context, m *Metric) error
+type GetterWithContext interface {
+	GetWithContext(ctx context.Context, m *Metric) error
 }
 
-type ContextListSetter interface {
-	SetListContext(ctx context.Context, in []Metric) error
+type ListSetterWithContext interface {
+	SetListWithContext(ctx context.Context, in []Metric) error
 }
 
-type ContextListGetter interface {
-	GetListContext(ctx context.Context) (out []Metric, err error)
+type ListGetterWithContext interface {
+	GetListWithContext(ctx context.Context) (out []Metric, err error)
 }
