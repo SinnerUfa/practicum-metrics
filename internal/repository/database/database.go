@@ -61,7 +61,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 		return nil, err
 	}
 	defer func() {
-		if err != nil {
+		if err != nil && db != nil {
 			err = errors.Join(err, db.Close())
 		}
 	}()
