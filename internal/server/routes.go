@@ -8,19 +8,20 @@ import (
 	chi "github.com/go-chi/chi/v5"
 )
 
-func Routes(rep repository.Storage) http.Handler {
+func Routes(rep *repository.Repository) http.Handler {
 	r := chi.NewRouter()
 	// r.Use(hundlers.Decompressor())
 	r.Use(hundlers.Compressor())
 	r.Use(hundlers.Logger())
 	r.Route("/", func(r chi.Router) {
-		r.Get("/", hundlers.GetList(rep))
+		s := rep.Storage()
+		r.Get("/", hundlers.GetList(s))
 		r.Get("/ping", hundlers.GetPing(rep))
-		r.Post("/update/{type}/{name}/{value}", hundlers.PostUpdate(rep))
-		r.Get("/value/{type}/{name}", hundlers.GetValue(rep))
-		r.Post("/update/", hundlers.PostJSONUpdate(rep))
-		r.Post("/value/", hundlers.PostJSONValue(rep))
-		r.Post("/updates/", hundlers.PostUpdates(rep))
+		r.Post("/update/{type}/{name}/{value}", hundlers.PostUpdate(s))
+		r.Get("/value/{type}/{name}", hundlers.GetValue(s))
+		r.Post("/update/", hundlers.PostJSONUpdate(s))
+		r.Post("/value/", hundlers.PostJSONValue(s))
+		r.Post("/updates/", hundlers.PostUpdates(s))
 	})
 
 	return r

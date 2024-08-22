@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/SinnerUfa/practicum-metric/internal/metrics"
 	"github.com/SinnerUfa/practicum-metric/internal/repository/database"
@@ -34,6 +35,7 @@ type Config struct {
 type Repository struct {
 	storageType RepositoryType
 	storage     any
+	db          *sql.DB
 }
 
 func New(ctx context.Context, cfg Config) (*Repository, error) {
@@ -45,6 +47,7 @@ func New(ctx context.Context, cfg Config) (*Repository, error) {
 			return nil, err
 		}
 		r.storage = storage
+		r.db = storage.DB()
 		return r, nil
 	}
 	if cfg.Restore {
@@ -154,4 +157,14 @@ func (r *Repository) Type() string {
 		return "file storage"
 	}
 	return "unknown storage"
+}
+
+func (r *Repository) Ping(ctx context.Context) bool {
+	if r.storageType != DBStorageType {
+		return true
+	}
+	if r.db == nil {
+		return false
+	}
+	return r.db.PingContext(ctx) == nil
 }

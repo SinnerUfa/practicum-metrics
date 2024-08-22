@@ -1,20 +1,18 @@
 package hundlers
 
 import (
+	"context"
 	"net/http"
-
-	metrics "github.com/SinnerUfa/practicum-metric/internal/metrics"
 )
 
-func GetPing(getter metrics.Getter) http.HandlerFunc {
+type Pinger interface {
+	Ping(ctx context.Context) bool
+}
+
+func GetPing(p Pinger) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			metr := &metrics.Metric{
-				Name:  "ping",
-				Type:  "",
-				Value: metrics.String("ping"),
-			}
-			if err := getter.Get(r.Context(), metr); err != nil {
+			if !p.Ping(r.Context()) {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

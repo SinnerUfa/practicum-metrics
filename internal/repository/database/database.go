@@ -129,9 +129,6 @@ func (d *Database) Set(ctx context.Context, m metrics.Metric) error {
 }
 
 func (d *Database) Get(ctx context.Context, m *metrics.Metric) error {
-	if m.Name == "ping" && m.Type == "" && m.Value.IsString() && m.Value.String() == "ping" {
-		return d.db.PingContext(ctx)
-	}
 	switch m.Type {
 	case metrics.MetricTypeCounter:
 		var value int64
@@ -266,4 +263,8 @@ func (d *Database) Close() error {
 		err = errors.Join(err, m.Close())
 	}
 	return errors.Join(err, d.db.Close())
+}
+
+func (d *Database) DB() *sql.DB {
+	return d.db
 }
