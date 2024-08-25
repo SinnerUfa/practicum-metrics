@@ -8,11 +8,13 @@ import (
 	chi "github.com/go-chi/chi/v5"
 )
 
-func Routes(rep *repository.Repository) http.Handler {
+func Routes(rep *repository.Repository, key string) http.Handler {
 	r := chi.NewRouter()
 	// r.Use(hundlers.Decompressor())
 	r.Use(hundlers.Compressor())
+	r.Use(hundlers.Hasher(key))
 	r.Use(hundlers.Logger())
+
 	r.Route("/", func(r chi.Router) {
 		s := rep.Storage()
 		r.Get("/", hundlers.GetList(s))

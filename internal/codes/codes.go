@@ -43,4 +43,8 @@ var (
 	ErrCompressor = errors.New("bad compressor init")
 	// decompressor
 	ErrDecompressor = errors.New("bad decompressor init")
+	// hasher
+	ErrHashNotBody    = errors.New("bad request - body is nil")
+	ErrHashNilHeader  = errors.New("bad request - hash in header is nil")
+	ErrHashNotCorrect = errors.New("bad request - hash isn`t correct")
 )

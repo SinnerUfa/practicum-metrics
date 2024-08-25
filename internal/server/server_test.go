@@ -116,7 +116,7 @@ func Test_Hundlers(t *testing.T) {
 		t.Run("testsGetVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(rep).ServeHTTP(w, request)
+			Routes(rep, "").ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -134,7 +134,7 @@ func Test_Hundlers(t *testing.T) {
 		t.Run("testsPostVoid", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(rep).ServeHTTP(w, request)
+			Routes(rep, "").ServeHTTP(w, request)
 
 			res := w.Result()
 
@@ -154,7 +154,7 @@ func Test_Hundlers(t *testing.T) {
 		t.Run("testsGet", func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, test.req, nil)
 			w := httptest.NewRecorder()
-			Routes(rep).ServeHTTP(w, request)
+			Routes(rep, "").ServeHTTP(w, request)
 
 			res := w.Result()
 
