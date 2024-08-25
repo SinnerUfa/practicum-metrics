@@ -5,6 +5,7 @@ type Config struct {
 	ReportInterval uint   `env:"REPORT_INTERVAL" flag:"r"`
 	PollInterval   uint   `env:"POLL_INTERVAL" flag:"p"`
 	ReportNoBatch  bool   `env:"REPORT_NOBATCH" flag:"nob"`
+	Key            string `env:"KEY" flag:"k"`
 }
 
 const (
