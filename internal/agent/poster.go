@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"context"
-	"encoding/json"
-	hash "github.com/SinnerUfa/practicum-metric/internal/hash"
+	// "encoding/json"
+	// hash "github.com/SinnerUfa/practicum-metric/internal/hash"
 	repository "github.com/SinnerUfa/practicum-metric/internal/repository"
 	resty "github.com/go-resty/resty/v2"
 )
@@ -34,11 +34,11 @@ func (m *MetricPost) Post() (err error) {
 		endpoint := "http://" + m.adress + "/update/"
 		for i, v := range l {
 			req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip")
-			if m.key != "" {
-				if b, err := json.Marshal(v); err != nil {
-					req.SetHeader("HashSHA256", hash.Hash(b, m.key))
-				}
-			}
+			// if m.key != "" {
+			// 	if b, err := json.Marshal(v); err != nil {
+			// 		req.SetHeader("HashSHA256", hash.Hash(b, m.key))
+			// 	}
+			// }
 			p, err := req.SetBody(v).Post(endpoint)
 			slog.Debug("request", "body", req.Body, "encoding", p.Header().Get("Content-Encoding"), "response", p.String())
 			if err != nil {
@@ -48,11 +48,11 @@ func (m *MetricPost) Post() (err error) {
 	} else {
 		endpoint := "http://" + m.adress + "/updates/"
 		req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip")
-		if m.key != "" {
-			if b, err := json.Marshal(l); err != nil {
-				req.SetHeader("HashSHA256", hash.Hash(b, m.key))
-			}
-		}
+		// if m.key != "" {
+		// 	if b, err := json.Marshal(l); err != nil {
+		// 		req.SetHeader("HashSHA256", hash.Hash(b, m.key))
+		// 	}
+		// }
 		p, err := req.SetBody(l).Post(endpoint)
 		slog.Debug("request", "body", req.Body, "encoding", p.Header().Get("Content-Encoding"), "response", p.String())
 		if err != nil {
