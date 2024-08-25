@@ -20,7 +20,7 @@ func (w *hashWriter) Header() http.Header {
 }
 
 func (w *hashWriter) Write(b []byte) (int, error) {
-	w.ResponseWriter.Header().Set("HashSHA256", hash.Hash(b, w.key))
+	w.ResponseWriter.Header().Set("Hash", hash.Hash(b, w.key))
 	return w.ResponseWriter.Write(b)
 }
 
@@ -40,7 +40,7 @@ func Hasher(key string) func(http.Handler) http.Handler {
 				slog.Warn("", "err", codes.ErrHashNotBody)
 				return
 			}
-			headerHash := r.Header.Get("HashSHA256")
+			headerHash := r.Header.Get("Hash")
 			if headerHash == "" {
 				http.Error(w, codes.ErrHashNilHeader.Error(), http.StatusBadRequest)
 				slog.Warn("", "err", codes.ErrHashNilHeader)
