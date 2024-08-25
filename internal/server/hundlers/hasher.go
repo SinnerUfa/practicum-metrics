@@ -20,7 +20,7 @@ func (w *hashWriter) Header() http.Header {
 }
 
 func (w *hashWriter) Write(b []byte) (int, error) {
-	w.ResponseWriter.Header().Set("HashSHA256", hash.Hash(b, w.key))
+	// w.ResponseWriter.Header().Set("HashSHA256", hash.Hash(b, w.key))
 	return w.ResponseWriter.Write(b)
 }
 
