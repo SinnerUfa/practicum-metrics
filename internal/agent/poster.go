@@ -37,7 +37,7 @@ func (m *MetricPost) Post() (err error) {
 			req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip")
 			if m.key != "" {
 				if b, err := json.Marshal(v); err != nil {
-					req.SetHeader("Hash", hash.Hash(b, m.key))
+					req.SetHeader("HashSHA256", hash.Hash(b, m.key))
 				}
 			}
 			p, err := req.SetBody(v).Post(endpoint)
@@ -51,7 +51,7 @@ func (m *MetricPost) Post() (err error) {
 		req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip")
 		if m.key != "" {
 			if b, err := json.Marshal(l); err != nil {
-				req.SetHeader("Hash", hash.Hash(b, m.key))
+				req.SetHeader("HashSHA256", hash.Hash(b, m.key))
 			}
 		}
 		p, err := req.SetBody(l).Post(endpoint)
