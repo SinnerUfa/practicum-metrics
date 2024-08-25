@@ -24,7 +24,6 @@ func NewPoster(rep repository.Storage, adress string, noBatch bool, key string) 
 }
 
 // т.к. resty парсит и сжимает прямо перед запросом сложно достать обработанное тело запроса
-// поэтому по-сути делаю два маршаллинга
 func (m *MetricPost) Post() (err error) {
 	l, err := m.rep.GetList(context.Background())
 	if err != nil {
