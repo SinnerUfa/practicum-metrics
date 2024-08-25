@@ -23,7 +23,6 @@ func NewPoster(rep repository.Storage, adress string, noBatch bool, key string) 
 	return &MetricPost{rep: rep, adress: adress, noBatch: noBatch, key: key}
 }
 
-// т.к. resty парсит и сжимает прямо перед запросом сложно достать обработанное тело запроса
 func (m *MetricPost) Post() (err error) {
 	l, err := m.rep.GetList(context.Background())
 	if err != nil {
@@ -64,7 +63,7 @@ func (m *MetricPost) Post() (err error) {
 	return err
 }
 
-func (m *MetricPost) Tick() { // вообще у resty есть повторы, нужно разобраться
+func (m *MetricPost) Tick() {
 	for _, delay := range []time.Duration{1 * time.Second, 3 * time.Second, 5 * time.Second} {
 		if m.Post() == nil {
 			break
