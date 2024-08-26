@@ -12,7 +12,7 @@ func Routes(rep *repository.Repository, key string) http.Handler {
 	r := chi.NewRouter()
 	// r.Use(hundlers.Decompressor())
 	r.Use(hundlers.Compressor())
-	r.Use(hundlers.Hasher(key))
+	// r.Use(hundlers.Hasher(key))
 	r.Use(hundlers.Logger())
 
 	r.Route("/", func(r chi.Router) {
