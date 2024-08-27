@@ -17,6 +17,7 @@ func main() {
 		ReportInterval: agent.DefaultReportInterval,
 		PollInterval:   agent.DefaultPollInterval,
 		ReportNoBatch:  agent.DefaultReportNoBatch,
+		RateLimit:      agent.DefaultRateLimit,
 	}
 	slog.SetDefault(mlog.New(mlog.ZapType, slog.LevelDebug))
 
