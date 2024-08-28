@@ -17,10 +17,11 @@ type MetricPost struct {
 	counter uint
 	noBatch bool
 	key     string
+	limit   uint
 }
 
-func NewPoster(rep repository.Storage, adress string, noBatch bool, key string) *MetricPost {
-	return &MetricPost{rep: rep, adress: adress, noBatch: noBatch, key: key}
+func NewPoster(rep repository.Storage, adress string, noBatch bool, key string, limit uint) *MetricPost {
+	return &MetricPost{rep: rep, adress: adress, noBatch: noBatch, key: key, limit: limit}
 }
 
 func (m *MetricPost) Post() (err error) {
@@ -28,21 +29,43 @@ func (m *MetricPost) Post() (err error) {
 	if err != nil {
 		return
 	}
+	if len(l) == 0 {
+		return
+	}
 	client := resty.New()
 	if m.noBatch {
 		endpoint := "http://" + m.adress + "/update/"
-		for i, v := range l {
-			req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip")
-			// if m.key != "" {
-			// 	if b, err := json.Marshal(v); err != nil {
-			// 		req.SetHeader("HashSHA256", hash.Hash(b, m.key))
-			// 	}
-			// }
-			p, err := req.SetBody(v).Post(endpoint)
-			slog.Debug("request", "body", req.Body, "encoding", p.Header().Get("Content-Encoding"), "response", p.String())
-			if err != nil {
-				slog.Warn("", "err", err, "i", i, "value", v)
-			}
+		var limit uint = uint(len(l))
+		if m.limit != 0 {
+			limit = m.limit
+		}
+		jobs := make(chan any, limit)
+		results := make(chan any, limit)
+		for w := 0; w < int(limit); w++ {
+			go func(jobs <-chan any, results chan<- any) {
+				for j := range jobs {
+					req := client.R().SetHeader("Content-Type", "application/json").SetHeader("Content-Encoding", "gzip")
+					// if m.key != "" {
+					// 	if b, err := json.Marshal(v); err != nil {
+					// 		req.SetHeader("HashSHA256", hash.Hash(b, m.key))
+					// 	}
+					// }
+					p, err := req.SetBody(j).Post(endpoint)
+					slog.Debug("request", "body", req.Body, "encoding", p.Header().Get("Content-Encoding"), "response", p.String())
+					if err != nil {
+						slog.Warn("", "err", err, "value", j)
+					}
+					results <- p.String()
+				}
+			}(jobs, results)
+		}
+		for _, v := range l {
+			jobs <- v
+		}
+		close(jobs)
+		for range l {
+			p := <-results
+			slog.Debug("request", "response done", p.(string))
 		}
 	} else {
 		endpoint := "http://" + m.adress + "/updates/"
@@ -71,3 +94,4 @@ func (m *MetricPost) Tick() {
 		time.Sleep(delay)
 	}
 }
+
