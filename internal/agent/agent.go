@@ -19,7 +19,7 @@ func Run(ctx context.Context, cfg Config) error {
 
 	loader := ticker.NewAndRun(ctx, cfg.PollInterval, NewLoader(rep.Storage()))
 	gloader := ticker.NewAndRun(ctx, cfg.PollInterval, GNewLoader(rep.Storage()))
-	poster := ticker.NewAndRun(ctx, cfg.ReportInterval, NewPoster(rep.Storage(), cfg.Adress, cfg.ReportNoBatch, cfg.Key))
+	poster := ticker.NewAndRun(ctx, cfg.ReportInterval, NewPoster(rep.Storage(), cfg.Adress, cfg.ReportNoBatch, cfg.Key, cfg.RateLimit))
 
 	<-ctx.Done()
 	loader.Close()
