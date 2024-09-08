@@ -35,7 +35,7 @@ func (m *MetricPost) Post() (err error) {
 	client := resty.New()
 	if m.noBatch {
 		endpoint := "http://" + m.adress + "/update/"
-		var limit uint = uint(len(l))
+		limit := uint(len(l))
 		if m.limit != 0 {
 			limit = m.limit
 		}
@@ -94,4 +94,3 @@ func (m *MetricPost) Tick() {
 		time.Sleep(delay)
 	}
 }
-
